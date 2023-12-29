@@ -1,0 +1,21 @@
+[package]
+name = "cydonia"
+authors = [ "clearloop" ]
+description = "Static blog generator, in rust."
+documentation = "https://docs.rs/cydonia"
+version = "0.0.2"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.77"
+ccli = "0.0.1"
+chrono = "0.4.31"
+colored = "2.1.0"
+etc = "0.1.18"
+handlebars = { version = "4.5.0", features = [ "dir_source" ] }
+notify = "6.1.1"
+pulldown-cmark = { version = "0.9.3", default-features = false }
+serde = { version = "1.0.193", features = [ "derive" ] }
+serde_yaml = "0.9.29"
+toml = "0.8.8"
+tracing = "0.1.40"
