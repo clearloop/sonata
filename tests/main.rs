@@ -1,11 +1,18 @@
 //! Main tests for cydonia.
 
 use anyhow::Result;
-use cydonia::{Manifest, Post};
+use cydonia::{App, Manifest, Post};
 use std::path::PathBuf;
 
 fn manifest() -> Result<Manifest> {
     Manifest::load(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("blog"))
+}
+
+#[test]
+fn render() -> Result<()> {
+    let app: App<'_> = manifest()?.try_into()?;
+    app.render()?;
+    Ok(())
 }
 
 #[test]

@@ -67,6 +67,15 @@ impl Manifest {
         Ok(manifest)
     }
 
+    /// Copy the public directory.
+    pub fn copy_public(&self) -> Result<()> {
+        if self.public.exists() {
+            std::fs::copy(&self.public, self.out.join("public"))?;
+        }
+
+        Ok(())
+    }
+
     /// Get the posts.
     pub fn posts(&self) -> Result<Vec<Post>> {
         fs::read_dir(&self.posts)?

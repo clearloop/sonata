@@ -15,7 +15,7 @@ use crate::{Manifest, Post, Theme};
 use anyhow::Result;
 use handlebars::Handlebars;
 use std::{
-    fs::File,
+    fs::{self, File},
     path::{Path, PathBuf},
 };
 
@@ -31,17 +31,41 @@ pub struct App<'app> {
     pub theme: Theme,
 }
 
-impl<'app> App<'app> {
-    /// Create a new app.
-    pub fn new(root: PathBuf) -> Result<Self> {
-        let manifest = Manifest::load(root)?;
+impl<'app> TryFrom<Manifest> for App<'app> {
+    type Error = anyhow::Error;
 
+    fn try_from(manifest: Manifest) -> Result<Self> {
         Ok(Self {
             handlebars: manifest.handlebars()?,
             posts: manifest.posts()?,
             theme: manifest.theme()?,
             manifest,
         })
+    }
+}
+
+impl<'app> App<'app> {
+    /// Create a new app.
+    pub fn load(root: PathBuf) -> Result<Self> {
+        Manifest::load(root)?.try_into()
+    }
+
+    /// Render the site.
+    pub fn render(&self) -> Result<()> {
+        fs::create_dir_all(&self.manifest.out)?;
+        self.render_index()?;
+        Ok(())
+    }
+
+    /// Render the index page.
+    pub fn render_index(&self) -> Result<()> {
+        self.render_template(
+            self.manifest.out.join("index.html"),
+            "index",
+            serde_json::json!({
+                "name": self.manifest.name,
+            }),
+        )
     }
 
     /// Render a template.
