@@ -1,6 +1,9 @@
 //! Manifest of the site.
 
-use crate::{utils::Read, Post, Theme};
+use crate::{
+    utils::{Prefix, Read},
+    Post, Theme,
+};
 use anyhow::Result;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
@@ -16,28 +19,29 @@ pub struct Manifest {
     pub name: String,
 
     /// The path to the favicon.
-    pub favicon: Option<PathBuf>,
+    #[serde(default = "default::favicon")]
+    pub favicon: PathBuf,
 
     /// The output directory.
-    #[serde(default = "Manifest::default_out")]
+    #[serde(default = "default::out")]
     pub out: PathBuf,
 
     /// The path of the posts.
-    #[serde(default = "Manifest::default_posts")]
+    #[serde(default = "default::posts")]
     pub posts: PathBuf,
 
     /// The path of the public directory.
-    #[serde(default = "Manifest::default_public")]
+    #[serde(default = "default::public")]
     pub public: PathBuf,
 
     /// The path of the templates.
-    #[serde(default = "Manifest::default_templates")]
+    #[serde(default = "default::templates")]
     pub templates: PathBuf,
 
     /// The path of the theme.
     ///
     /// Could be a file or a directory.
-    #[serde(default = "Manifest::default_theme")]
+    #[serde(default = "default::theme")]
     pub theme: PathBuf,
 }
 
@@ -45,30 +49,10 @@ impl Manifest {
     /// Load manifest from the provided path.
     pub fn load(root: impl AsRef<Path>) -> Result<Self> {
         let path = root.as_ref().join("cydonia.toml");
-        let mut manifest: Self = toml::from_str(&root.as_ref().join("cydonia.toml").read()?)
+        let manifest: Self = toml::from_str(&root.as_ref().join("cydonia.toml").read()?)
             .map_err(|e| anyhow::anyhow!("Failed to parse {}: {}", path.display(), e))?;
 
-        if manifest.out.is_relative() {
-            manifest.out = root.as_ref().join(&manifest.out);
-        }
-
-        if manifest.posts.is_relative() {
-            manifest.posts = root.as_ref().join(&manifest.posts);
-        }
-
-        if manifest.public.is_relative() {
-            manifest.public = root.as_ref().join(&manifest.public);
-        }
-
-        if manifest.templates.is_relative() {
-            manifest.templates = root.as_ref().join(&manifest.templates);
-        }
-
-        if manifest.theme.is_relative() {
-            manifest.theme = root.as_ref().join(&manifest.theme);
-        }
-
-        Ok(manifest)
+        Ok(manifest.abs(root))
     }
 
     /// Copy the public directory.
@@ -101,28 +85,48 @@ impl Manifest {
         Theme::load(&self.theme)
     }
 
+    /// Make paths absolute.
+    fn abs(mut self, prefix: impl AsRef<Path>) -> Self {
+        self.favicon.prefix(&prefix);
+        self.out.prefix(&prefix);
+        self.posts.prefix(&prefix);
+        self.public.prefix(&prefix);
+        self.templates.prefix(&prefix);
+        self.theme.prefix(&prefix);
+        self
+    }
+}
+
+mod default {
+    use std::{fs, path::PathBuf};
+
     /// Default implementation of the out directory.
-    pub fn default_out() -> PathBuf {
+    pub fn favicon() -> PathBuf {
+        fs::canonicalize(PathBuf::from("favicon")).unwrap_or_default()
+    }
+
+    /// Default implementation of the out directory.
+    pub fn out() -> PathBuf {
         fs::canonicalize(PathBuf::from("out")).unwrap_or_default()
     }
 
     /// Default implementation of the posts.
-    pub fn default_posts() -> PathBuf {
+    pub fn posts() -> PathBuf {
         fs::canonicalize(PathBuf::from("posts")).unwrap_or_default()
     }
 
     /// Default implementation of the posts.
-    pub fn default_public() -> PathBuf {
+    pub fn public() -> PathBuf {
         fs::canonicalize(PathBuf::from("public")).unwrap_or_default()
     }
 
     /// Default implementation of the templates.
-    pub fn default_templates() -> PathBuf {
+    pub fn templates() -> PathBuf {
         fs::canonicalize(PathBuf::from("templates")).unwrap_or_default()
     }
 
     /// Default implementation of the templates.
-    pub fn default_theme() -> PathBuf {
+    pub fn theme() -> PathBuf {
         fs::canonicalize(PathBuf::from("theme.css")).unwrap_or_default()
     }
 }
