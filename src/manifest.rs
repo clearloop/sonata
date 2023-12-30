@@ -15,6 +15,9 @@ pub struct Manifest {
     /// The name of the site.
     pub name: String,
 
+    /// The path to the favicon.
+    favicon: Option<PathBuf>,
+
     /// The path of the posts.
     #[serde(default = "Manifest::default_posts")]
     pub posts: PathBuf,
