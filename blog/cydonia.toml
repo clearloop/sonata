@@ -1,1 +1,4 @@
 name = "Cydonia"
+posts = "posts"
+templates = "templates"
+theme = "theme.css"
