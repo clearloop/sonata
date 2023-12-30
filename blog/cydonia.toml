@@ -1,5 +1,5 @@
 # my-blog/cydonia.toml
-name = "Cydonia"          # The name of the site.
+title = "Cydonia"         # The title of the site.
 
 # Default values of the optional fields.
 # --------------------------------------

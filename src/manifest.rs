@@ -21,7 +21,7 @@ use ccli::{clap, clap::Parser};
 pub struct Manifest {
     /// The name of the site.
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "Cydonia"))]
-    pub name: String,
+    pub title: String,
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]

@@ -1,6 +1,7 @@
 //! cydonia cli
 #![cfg(feature = "cli")]
 
+pub use self::{build::Build, init::Init, serve::Serve, watch::Watch};
 use ccli::{clap, clap::Parser, App};
 
 mod build;
@@ -12,13 +13,13 @@ mod watch;
 #[derive(Debug, Parser)]
 pub enum Command {
     /// Builds a cydonia site from its markdown files
-    Build(build::Build),
+    Build(Build),
     /// Creates the boilerplate structure and files for a cydonia site
-    Init(init::Init),
+    Init(Init),
     /// Serves a cydonia site, and rebuilds it on changes
-    Serve(serve::Serve),
+    Serve(Serve),
     /// Watches a cydonia site's files and rebuilds it on changes
-    Watch(watch::Watch),
+    Watch(Watch),
 }
 
 /// Cydonia command line interface

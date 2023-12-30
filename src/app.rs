@@ -71,7 +71,7 @@ impl<'app> App<'app> {
             self.manifest.out.join("index.html"),
             "index",
             serde_json::json!({
-                "name": self.manifest.name,
+                "title": self.manifest.title,
                 "index": true,
             }),
         )

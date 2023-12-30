@@ -4,7 +4,7 @@ use anyhow::Result;
 use ccli::{clap, clap::Parser};
 use std::path::PathBuf;
 
-/// Create a new cydonia project
+/// Init command
 #[derive(Parser, Debug)]
 pub struct Init {
     /// The directory to init cydonia project

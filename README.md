@@ -4,7 +4,7 @@ The static site generator in rust.
 
 ```toml
 # my-blog/cydonia.toml
-name = "Cydonia"          # The name of the site.
+title = "Cydonia"          # The name of the site.
 
 # Default values of the optional fields.
 # --------------------------------------

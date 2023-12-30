@@ -1,20 +1,24 @@
 //! Command serve
 
+use crate::cmd::Watch;
 use anyhow::Result;
 use ccli::{clap, clap::Parser};
-use std::{net::SocketAddrV4, path::PathBuf};
+use std::net::SocketAddrV4;
 
+/// Serve command
 #[derive(Parser, Debug)]
 pub struct Serve {
     /// Port to listen on
+    #[clap(short, long, default_value = "3000")]
     pub port: u16,
 
     /// Address to listen on
+    #[clap(short, long, default_value = "0.0.0.0")]
     pub address: SocketAddrV4,
 
-    /// Path to the output directory
-    #[clap(short, long, default_value = "out")]
-    pub out: PathBuf,
+    /// Watch configuration
+    #[clap(flatten)]
+    pub watch: Watch,
 }
 
 impl Serve {
