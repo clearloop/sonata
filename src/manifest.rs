@@ -1,6 +1,6 @@
 //! Manifest of the site.
 
-use crate::{utils::Read, Post};
+use crate::{utils::Read, Post, Theme};
 use anyhow::Result;
 use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
@@ -16,7 +16,11 @@ pub struct Manifest {
     pub name: String,
 
     /// The path to the favicon.
-    favicon: Option<PathBuf>,
+    pub favicon: Option<PathBuf>,
+
+    /// The output directory.
+    #[serde(default = "Manifest::default_out")]
+    pub out: PathBuf,
 
     /// The path of the posts.
     #[serde(default = "Manifest::default_posts")]
@@ -39,6 +43,10 @@ impl Manifest {
         let path = root.as_ref().join("cydonia.toml");
         let mut manifest: Self = toml::from_str(&root.as_ref().join("cydonia.toml").read()?)
             .map_err(|e| anyhow::anyhow!("Failed to parse {}: {}", path.display(), e))?;
+
+        if manifest.out.is_relative() {
+            manifest.out = root.as_ref().join(&manifest.out);
+        }
 
         if manifest.posts.is_relative() {
             manifest.posts = root.as_ref().join(&manifest.posts);
@@ -65,6 +73,16 @@ impl Manifest {
         handlebars.register_templates_directory(".hbs", &self.templates)?;
 
         Ok(handlebars)
+    }
+
+    /// Get the theme.
+    pub fn theme(&self) -> Result<Theme> {
+        Theme::load(&self.theme)
+    }
+
+    /// Default implementation of the out directory.
+    pub fn default_out() -> PathBuf {
+        fs::canonicalize(PathBuf::from("out")).unwrap_or_default()
     }
 
     /// Default implementation of the posts.

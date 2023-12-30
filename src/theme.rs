@@ -2,7 +2,7 @@
 
 use crate::utils::Read;
 use anyhow::Result;
-use std::path::PathBuf;
+use std::path::Path;
 
 /// The theme for the site.
 #[derive(Debug, Clone)]
@@ -15,7 +15,8 @@ pub struct Theme {
 
 impl Theme {
     /// Loads theme from the given path.
-    pub fn load(path: PathBuf) -> Result<Self> {
+    pub fn load(path: impl AsRef<Path>) -> Result<Self> {
+        let path = path.as_ref();
         if path.is_file() {
             let theme = path.read()?;
 

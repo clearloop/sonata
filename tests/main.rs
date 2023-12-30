@@ -1,40 +1,41 @@
 //! Main tests for cydonia.
 
 use anyhow::Result;
-use cydonia::{App, Post};
+use cydonia::{App, Manifest, Post};
 use std::path::PathBuf;
 
-fn blog() -> Result<App> {
-    App::new(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("blog"))
+fn app() -> Result<App> {
+    App::load(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("blog"))
+}
+
+fn manifest() -> Result<Manifest> {
+    Manifest::load(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("blog")
+            .join("cydonia.toml"),
+    )
 }
 
 #[test]
-fn app() -> Result<()> {
-    blog()?;
-
+fn resource() -> Result<()> {
+    app()?;
     Ok(())
 }
 
 #[test]
 fn handlebars() -> Result<()> {
-    let app = blog()?;
-    app.manifest.handlebars()?;
-
+    manifest()?.handlebars()?;
     Ok(())
 }
 
 #[test]
 fn post() -> Result<()> {
-    let app = blog()?;
-    Post::load(app.manifest.posts.join("2023-12-29-hello-world.md"))?;
-
+    Post::load(manifest()?.posts.join("2023-12-29-hello-world.md"))?;
     Ok(())
 }
 
 #[test]
 fn posts() -> Result<()> {
-    let app = blog()?;
-    app.manifest.posts()?;
-
+    manifest()?.posts()?;
     Ok(())
 }
