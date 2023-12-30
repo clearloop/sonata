@@ -53,8 +53,16 @@ impl<'app> App<'app> {
     /// Render the site.
     pub fn render(&self) -> Result<()> {
         fs::create_dir_all(&self.manifest.out)?;
+        self.manifest.copy_public()?;
+        self.render_css()?;
         self.render_index()?;
         Ok(())
+    }
+
+    /// Write css to the output directory.
+    pub fn render_css(&self) -> Result<()> {
+        fs::write(self.manifest.out.join("index.css"), &self.theme.index)?;
+        fs::write(self.manifest.out.join("post.css"), &self.theme.post).map_err(Into::into)
     }
 
     /// Render the index page.
@@ -64,6 +72,7 @@ impl<'app> App<'app> {
             "index",
             serde_json::json!({
                 "name": self.manifest.name,
+                "index": true,
             }),
         )
     }

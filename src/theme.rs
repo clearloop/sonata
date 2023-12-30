@@ -28,10 +28,14 @@ impl Theme {
             })
         } else {
             let theme = path.join("theme.css").read().unwrap_or_default();
-
-            let index = [theme.clone(), path.join("index.css").read()?].concat();
-            let post = [theme, path.join("post.css").read()?].concat();
-            Ok(Self { index, post })
+            Ok(Self {
+                index: [
+                    theme.clone(),
+                    path.join("index.css").read().unwrap_or_default(),
+                ]
+                .concat(),
+                post: [theme, path.join("post.css").read().unwrap_or_default()].concat(),
+            })
         }
     }
 }

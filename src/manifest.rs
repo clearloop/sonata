@@ -64,6 +64,10 @@ impl Manifest {
             manifest.templates = root.as_ref().join(&manifest.templates);
         }
 
+        if manifest.theme.is_relative() {
+            manifest.theme = root.as_ref().join(&manifest.theme);
+        }
+
         Ok(manifest)
     }
 
