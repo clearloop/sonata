@@ -1,4 +1,4 @@
-//! The static site genrator.
+//! The static site generator.
 
 mod app;
 mod manifest;
