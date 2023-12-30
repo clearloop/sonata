@@ -17,8 +17,8 @@ where
         let path = self.as_ref();
         std::fs::read_to_string(path).map_err(|e| {
             anyhow::anyhow!(
-                "Failed to read file: {}, error: {}",
-                path.display().to_string().dimmed().underline(),
+                "Failed to read file: {}, {}",
+                path.display().to_string().underline(),
                 e.to_string()
             )
         })

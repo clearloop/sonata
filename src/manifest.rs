@@ -26,6 +26,10 @@ pub struct Manifest {
     #[serde(default = "Manifest::default_posts")]
     pub posts: PathBuf,
 
+    /// The path of the public directory.
+    #[serde(default = "Manifest::default_public")]
+    pub public: PathBuf,
+
     /// The path of the templates.
     #[serde(default = "Manifest::default_templates")]
     pub templates: PathBuf,
@@ -50,6 +54,10 @@ impl Manifest {
 
         if manifest.posts.is_relative() {
             manifest.posts = root.as_ref().join(&manifest.posts);
+        }
+
+        if manifest.public.is_relative() {
+            manifest.public = root.as_ref().join(&manifest.public);
         }
 
         if manifest.templates.is_relative() {
@@ -88,6 +96,11 @@ impl Manifest {
     /// Default implementation of the posts.
     pub fn default_posts() -> PathBuf {
         fs::canonicalize(PathBuf::from("posts")).unwrap_or_default()
+    }
+
+    /// Default implementation of the posts.
+    pub fn default_public() -> PathBuf {
+        fs::canonicalize(PathBuf::from("public")).unwrap_or_default()
     }
 
     /// Default implementation of the templates.
