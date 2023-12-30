@@ -16,6 +16,7 @@ handlebars = { version = "4.5.0", features = [ "dir_source" ] }
 notify = "6.1.1"
 pulldown-cmark = { version = "0.9.3", default-features = false }
 serde = { version = "1.0.193", features = [ "derive" ] }
+serde_json = "1.0.108"
 serde_yaml = "0.9.29"
 toml = "0.8.8"
 tracing = "0.1.40"
