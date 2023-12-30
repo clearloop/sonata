@@ -27,7 +27,7 @@ impl Theme {
             let theme = path.join("theme.css").read().unwrap_or_default();
 
             let index = [theme.clone(), path.join("index.css").read()?].concat();
-            let post = [theme.clone(), path.join("post.css").read()?].concat();
+            let post = [theme, path.join("post.css").read()?].concat();
             Ok(Self { index, post })
         }
     }
