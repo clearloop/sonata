@@ -16,4 +16,4 @@ templates = "templates"   # The path to the templates.
 #   - index.css (required)
 #   - post.css  (required)
 #   - theme.css (optional)
-theme = "theme.css"
+theme = "theme"

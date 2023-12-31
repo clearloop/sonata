@@ -1,8 +1,11 @@
 {{#*inline "page"}}
-<main class="prose p-8">
+<article class="prose dark:prose-invert px-8 pt-12 max-w-5xl mx-auto">
     <h1>{{ post.title }}</h1>
     {{{ post.content }}}
-</main>
+</article>
+<script>
+ hljs.highlightAll()
+</script>
 {{/inline}}
 
 {{> layout }}
