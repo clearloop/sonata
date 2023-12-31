@@ -76,7 +76,9 @@ impl<'app> App<'app> {
             .register_templates_directory(".hbs", &self.manifest.templates)?;
         self.manifest.copy_public()?;
         self.render_css()?;
-        self.render_index()?;
+
+        let posts = self.manifest.posts()?;
+        self.render_index(posts)?;
         Ok(())
     }
 
@@ -88,7 +90,7 @@ impl<'app> App<'app> {
     }
 
     /// Render the index page.
-    pub fn render_index(&self) -> Result<()> {
+    pub fn render_index(&self, posts: Vec<Post>) -> Result<()> {
         self.render_template(
             "index.html",
             "index",
@@ -96,6 +98,7 @@ impl<'app> App<'app> {
                 "title": self.manifest.title,
                 "index": true,
                 "livereload": self.livereload,
+                "posts": posts,
             }),
         )
     }

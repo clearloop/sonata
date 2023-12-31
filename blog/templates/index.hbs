@@ -1,6 +1,10 @@
 {{#*inline "page"}}
 <main>
     <h1>{{ title }}</h1>
+
+    {{#each posts}}
+        <div>{{{  index  }}} {{{  title  }}}</div>
+    {{/each}}
 </main>
 {{/inline}}
 
