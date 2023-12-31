@@ -11,11 +11,12 @@
 //!     - theme.css
 //! ```
 
-use crate::{Manifest, Post};
+use crate::{utils, Manifest, Post};
 use anyhow::Result;
 use handlebars::Handlebars;
 use std::{
     fs::{self, File},
+    io::Write,
     path::{Path, PathBuf},
 };
 
@@ -70,7 +71,7 @@ impl<'app> App<'app> {
         tracing::info!("rendering the site to {} ...", self.manifest.out.display());
         fs::create_dir_all(&self.manifest.out)?;
         self.handlebars
-            .register_templates_directory(".hbs", &self.manifest.templates)?;
+            .register_templates_directory(&self.manifest.templates, Default::default())?;
         self.manifest.copy_public()?;
         self.render_css()?;
 
@@ -144,8 +145,10 @@ impl<'app> App<'app> {
         let path = self.manifest.out.join(name);
         tracing::debug!("rendering {path:?} ...");
 
-        let file = File::create(path)?;
-        self.handlebars.render_to_write(template, &data, file)?;
+        let mut file = File::create(path)?;
+        let mut rendered = self.handlebars.render(template, &data)?;
+        rendered = utils::fix_code_block(&rendered);
+        file.write_all(rendered.as_bytes())?;
         Ok(())
     }
 }
