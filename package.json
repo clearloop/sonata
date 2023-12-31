@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "tailwindcss": "^3.4.0"
+  },
+  "scripts": {
+    "default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --watch --minify"
+  }
+}

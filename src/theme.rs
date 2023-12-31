@@ -17,6 +17,8 @@ impl Theme {
     /// Loads theme from the given path.
     pub fn load(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref();
+        tracing::debug!("Loading theme from {path:?} ...");
+
         if !path.exists() {
             Ok(Default::default())
         } else if path.is_file() {

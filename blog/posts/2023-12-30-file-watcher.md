@@ -8,9 +8,6 @@ title: The file watcher implementation in cydonia.
 # hello
 
 ```rust
-// function block.
-
-/// main function
 fn main() {
   println!("hello, world");
 }

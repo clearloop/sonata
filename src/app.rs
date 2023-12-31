@@ -82,10 +82,19 @@ impl<'app> App<'app> {
 
     /// Write css to the output directory.
     pub fn render_css(&self) -> Result<()> {
-        tracing::debug!("rendering css ...");
         let theme = self.manifest.theme()?;
         fs::write(self.manifest.out.join("index.css"), &theme.index)?;
-        fs::write(self.manifest.out.join("post.css"), &theme.post).map_err(Into::into)
+        fs::write(self.manifest.out.join("post.css"), &theme.post)?;
+
+        // Copy highlight.{css, js}
+        for hl in ["highlight.js", "highlight.css"] {
+            let path = self.manifest.theme.join(hl);
+            if path.exists() {
+                fs::copy(path, self.manifest.out.join(hl))?;
+            }
+        }
+
+        Ok(())
     }
 
     /// Render the index page.

@@ -1,12 +1,15 @@
 {{#*inline "page"}}
-<main class="prose p-8">
-    <h1>{{ title }}</h1>
-
-    <section class="posts">
-    {{#each posts}}
-        <div><a href="{{{ link }}}">{{{ index }}} {{{ title }}}</a></div>
-    {{/each}}
-    </section>
+<main>
+    <table class="table-auto max-w-full text-2xl">
+      <tbody>
+      {{#each posts}}
+          <tr>
+            <td class="px-6 py-3 text-gray-500">{{{ index }}}</td>
+            <td><a href="{{{ link }}}">{{{ title }}}</a></td>
+          </tr>
+      {{/each}}
+      </tbody>
+    </table>
 </main>
 {{/inline}}
 
