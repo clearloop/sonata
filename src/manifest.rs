@@ -68,8 +68,15 @@ impl Manifest {
 
     /// Copy the public directory.
     pub fn copy_public(&self) -> Result<()> {
+        let public = self.out.join("public");
         if self.public.exists() {
-            std::fs::copy(&self.public, self.out.join("public"))?;
+            tracing::debug!(
+                "copying public directory {} -> {}",
+                self.public.display(),
+                public.display()
+            );
+
+            etc::cp_r(&self.public, &public)?;
         }
 
         Ok(())
@@ -109,6 +116,17 @@ impl Manifest {
         if other.theme != default::theme() {
             self.theme = other.theme;
         }
+    }
+
+    /// Get all the paths.
+    pub fn paths(&self) -> Vec<PathBuf> {
+        vec![
+            self.favicon.clone(),
+            self.posts.clone(),
+            self.public.clone(),
+            self.templates.clone(),
+            self.theme.clone(),
+        ]
     }
 
     /// Get the posts.
