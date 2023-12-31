@@ -11,13 +11,16 @@
 //!     - theme.css
 //! ```
 
-use crate::{Manifest, Post, Theme};
+use crate::{Manifest, Post};
 use anyhow::Result;
 use handlebars::Handlebars;
 use std::{
     fs::{self, File},
-    path::Path,
+    path::{Path, PathBuf},
 };
+
+/// The endpoint for livereload
+pub const LIVERELOAD_ENDPOINT: &str = "__livereload";
 
 /// The root of the site.
 #[derive(Clone, Debug)]
@@ -25,24 +28,24 @@ pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
     /// Port for the livereload server.
-    pub livereload: Option<u16>,
+    pub livereload: Option<&'static str>,
     /// The cydonia.toml manifest.
     pub manifest: Manifest,
     /// The posts.
     pub posts: Vec<Post>,
-    /// The theme.
-    pub theme: Theme,
 }
 
 impl<'app> TryFrom<Manifest> for App<'app> {
     type Error = anyhow::Error;
 
     fn try_from(manifest: Manifest) -> Result<Self> {
+        let mut handlebars = Handlebars::new();
+        handlebars.set_strict_mode(true);
+
         Ok(Self {
-            handlebars: manifest.handlebars()?,
+            handlebars,
             livereload: None,
             posts: manifest.posts()?,
-            theme: manifest.theme()?,
             manifest,
         })
     }
@@ -50,8 +53,8 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 
 impl<'app> App<'app> {
     /// Set the port of the livereload server.
-    pub fn livereload(&mut self, port: u16) {
-        self.livereload = Some(port);
+    pub fn livereload(&mut self) {
+        self.livereload = Some(LIVERELOAD_ENDPOINT);
     }
 
     /// Create a new app.
@@ -61,34 +64,65 @@ impl<'app> App<'app> {
     }
 
     /// Render the site.
-    pub fn render(&self) -> Result<()> {
+    ///
+    /// TODO: render specified modules.
+    pub fn render(&mut self) -> Result<()> {
         tracing::info!("rendering the site to {} ...", self.manifest.out.display());
-        tracing::debug!("creating output directory ...");
         fs::create_dir_all(&self.manifest.out)?;
+        self.handlebars
+            .register_templates_directory(".hbs", &self.manifest.templates)?;
         self.manifest.copy_public()?;
         self.render_css()?;
-        self.render_index()?;
+
+        let posts = self.manifest.posts()?;
+        self.render_posts(posts.clone())?;
+        self.render_index(posts)?;
         Ok(())
     }
 
     /// Write css to the output directory.
     pub fn render_css(&self) -> Result<()> {
         tracing::debug!("rendering css ...");
-        fs::write(self.manifest.out.join("index.css"), &self.theme.index)?;
-        fs::write(self.manifest.out.join("post.css"), &self.theme.post).map_err(Into::into)
+        let theme = self.manifest.theme()?;
+        fs::write(self.manifest.out.join("index.css"), &theme.index)?;
+        fs::write(self.manifest.out.join("post.css"), &theme.post).map_err(Into::into)
     }
 
     /// Render the index page.
-    pub fn render_index(&self) -> Result<()> {
-        tracing::debug!("rendering index.html ...");
+    pub fn render_index(&self, posts: Vec<Post>) -> Result<()> {
         self.render_template(
             "index.html",
             "index",
             serde_json::json!({
                 "title": self.manifest.title,
                 "index": true,
+                "livereload": self.livereload,
+                "posts": posts,
             }),
         )
+    }
+
+    /// Render post.
+    pub fn render_post(&self, post: Post) -> Result<()> {
+        post.path.file_name().unwrap_or_default();
+        self.render_template(
+            PathBuf::from(&post.index.link),
+            "post",
+            serde_json::json!({
+                "title": self.manifest.title,
+                "livereload": self.livereload,
+                "post": post,
+            }),
+        )
+    }
+
+    /// Render the posts.
+    pub fn render_posts(&self, posts: Vec<Post>) -> Result<()> {
+        fs::create_dir_all(self.manifest.out.join("posts"))?;
+        for post in posts {
+            self.render_post(post)?;
+        }
+        Ok(())
     }
 
     /// Render a template.
@@ -98,7 +132,10 @@ impl<'app> App<'app> {
         template: &str,
         data: serde_json::Value,
     ) -> Result<()> {
-        let file = File::create(self.manifest.out.join(name.as_ref()))?;
+        let path = self.manifest.out.join(name);
+        tracing::debug!("rendering {path:?} ...");
+
+        let file = File::create(path)?;
         self.handlebars.render_to_write(template, &data, file)?;
         Ok(())
     }

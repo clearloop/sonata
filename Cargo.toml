@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.77"
-chrono = "0.4.31"
+chrono = { version = "0.4.31", features = [ "serde" ] }
 colored = "2.1.0"
 etc = { version = "0.1.18", features = [ "serde" ] }
 handlebars = { version = "4.5.0", features = [ "dir_source" ] }
@@ -25,6 +25,7 @@ notify = { version = "6.1.1", optional = true }
 tokio = { version = "1.35.1", features = [ "rt-multi-thread" ], optional = true }
 warp = { version = "0.3.6", optional = true }
 futures = { version = "0.3.30", optional = true }
+async-lock = "3.2.0"
 
 [features]
 default = [ "cli" ]

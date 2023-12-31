@@ -5,7 +5,6 @@ use crate::{
     Post, Theme,
 };
 use anyhow::Result;
-use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
 use std::{
     fs,
@@ -80,15 +79,6 @@ impl Manifest {
         }
 
         Ok(())
-    }
-
-    /// Resource the templates into handlebars.
-    pub fn handlebars<'r>(&self) -> Result<Handlebars<'r>> {
-        let mut handlebars = Handlebars::new();
-        handlebars.set_strict_mode(true);
-        handlebars.register_templates_directory(".hbs", &self.templates)?;
-
-        Ok(handlebars)
     }
 
     /// Merge two manifests.

@@ -24,18 +24,9 @@ pub struct Watch {
     /// The output directory
     #[clap(short, long, default_value = "out")]
     pub out: PathBuf,
-
-    /// The port of the livereload server
-    #[clap(skip)]
-    livereload: Option<u16>,
 }
 
 impl Watch {
-    /// Set the livereload port.
-    pub fn livereload(&mut self, port: u16) {
-        self.livereload = Some(port);
-    }
-
     /// Make the output directory absolute.
     pub fn manifest(&self) -> Result<Manifest> {
         let mut manifest = Manifest::load(&self.dir)?;
@@ -49,9 +40,7 @@ impl Watch {
     /// Watch the given directory.
     pub fn watch(&self, manifest: Manifest, tx: Sender<Event>) -> Result<()> {
         let mut app: App<'_> = manifest.try_into()?;
-        if let Some(port) = self.livereload {
-            app.livereload(port);
-        }
+        app.livereload();
         app.render()?;
 
         tracing::info!(

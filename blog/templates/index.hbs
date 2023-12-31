@@ -1,6 +1,12 @@
 {{#*inline "page"}}
-<main>
+<main class="prose p-8">
     <h1>{{ title }}</h1>
+
+    <section class="posts">
+    {{#each posts}}
+        <div><a href="{{{ link }}}">{{{ index }}} {{{ title }}}</a></div>
+    {{/each}}
+    </section>
 </main>
 {{/inline}}
 
