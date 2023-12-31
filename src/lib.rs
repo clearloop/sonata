@@ -1,6 +1,7 @@
 //! The static site generator.
 
 mod app;
+pub mod cmd;
 mod manifest;
 mod post;
 mod theme;
