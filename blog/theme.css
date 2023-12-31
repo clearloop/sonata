@@ -3,4 +3,6 @@ body {
   min-height: 100%;
   background-color: #000;
   color: #fefefe;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    Liberation Mono, Courier New, monospace;
 }

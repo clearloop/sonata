@@ -10,14 +10,8 @@ fn manifest() -> Result<Manifest> {
 
 #[test]
 fn render() -> Result<()> {
-    let app: App<'_> = manifest()?.try_into()?;
+    let mut app: App<'_> = manifest()?.try_into()?;
     app.render()?;
-    Ok(())
-}
-
-#[test]
-fn handlebars() -> Result<()> {
-    manifest()?.handlebars()?;
     Ok(())
 }
 

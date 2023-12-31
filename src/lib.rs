@@ -8,7 +8,7 @@ mod theme;
 mod utils;
 
 pub use self::{
-    app::App,
+    app::{App, LIVERELOAD_ENDPOINT},
     manifest::Manifest,
     post::{Meta, Post},
     theme::Theme,

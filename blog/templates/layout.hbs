@@ -10,6 +10,22 @@
     {{#if post}}
       <link rel="stylesheet" href="/post.css">
     {{/if}}
+    {{#if livereload}}
+      <script>
+       const socket = new WebSocket(`ws://${location.host}` + "/" + "{{{ livereload }}}");
+       socket.onmessage = function (event) {
+         console.log(event)
+         if (event.data === "reload") {
+           socket.close();
+           location.reload();
+         }
+       };
+
+       window.onbeforeunload = function() {
+         socket.close();
+       }
+      </script>
+    {{/if}}
   </head>
   <body>
      {{> page }}

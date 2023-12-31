@@ -19,13 +19,16 @@ use std::{
     path::Path,
 };
 
+/// The endpoint for livereload
+pub const LIVERELOAD_ENDPOINT: &str = "__livereload";
+
 /// The root of the site.
 #[derive(Clone, Debug)]
 pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
     /// Port for the livereload server.
-    pub livereload: Option<u16>,
+    pub livereload: Option<&'static str>,
     /// The cydonia.toml manifest.
     pub manifest: Manifest,
     /// The posts.
@@ -38,8 +41,11 @@ impl<'app> TryFrom<Manifest> for App<'app> {
     type Error = anyhow::Error;
 
     fn try_from(manifest: Manifest) -> Result<Self> {
+        let mut handlebars = Handlebars::new();
+        handlebars.set_strict_mode(true);
+
         Ok(Self {
-            handlebars: manifest.handlebars()?,
+            handlebars,
             livereload: None,
             posts: manifest.posts()?,
             theme: manifest.theme()?,
@@ -50,8 +56,8 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 
 impl<'app> App<'app> {
     /// Set the port of the livereload server.
-    pub fn livereload(&mut self, port: u16) {
-        self.livereload = Some(port);
+    pub fn livereload(&mut self) {
+        self.livereload = Some(LIVERELOAD_ENDPOINT);
     }
 
     /// Create a new app.
@@ -61,10 +67,11 @@ impl<'app> App<'app> {
     }
 
     /// Render the site.
-    pub fn render(&self) -> Result<()> {
+    pub fn render(&mut self) -> Result<()> {
         tracing::info!("rendering the site to {} ...", self.manifest.out.display());
-        tracing::debug!("creating output directory ...");
         fs::create_dir_all(&self.manifest.out)?;
+        self.handlebars
+            .register_templates_directory(".hbs", &self.manifest.templates)?;
         self.manifest.copy_public()?;
         self.render_css()?;
         self.render_index()?;
@@ -80,13 +87,13 @@ impl<'app> App<'app> {
 
     /// Render the index page.
     pub fn render_index(&self) -> Result<()> {
-        tracing::debug!("rendering index.html ...");
         self.render_template(
             "index.html",
             "index",
             serde_json::json!({
                 "title": self.manifest.title,
                 "index": true,
+                "livereload": self.livereload,
             }),
         )
     }
@@ -98,7 +105,9 @@ impl<'app> App<'app> {
         template: &str,
         data: serde_json::Value,
     ) -> Result<()> {
-        let file = File::create(self.manifest.out.join(name.as_ref()))?;
+        let path = self.manifest.out.join(name);
+        tracing::debug!("rendering {} ...", path.display());
+        let file = File::create(path)?;
         self.handlebars.render_to_write(template, &data, file)?;
         Ok(())
     }

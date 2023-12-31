@@ -1,6 +1,6 @@
 //! Command serve
 
-use crate::cmd::Watch;
+use crate::{cmd::Watch, LIVERELOAD_ENDPOINT};
 use anyhow::Result;
 use ccli::{clap, clap::Parser};
 use futures::{sink::SinkExt, FutureExt, StreamExt};
@@ -17,9 +17,6 @@ use warp::{
     ws::{Message, WebSocket, Ws},
     Filter,
 };
-
-/// The endpoint for livereload
-const LIVERELOAD_ENDPOINT: &str = "__livereload";
 
 /// Serve command
 #[derive(Parser, Debug)]
@@ -40,7 +37,7 @@ pub struct Serve {
 impl Serve {
     /// Pick a port for the livereload server
     fn pick(&self) -> u16 {
-        let mut base = self.port + 1;
+        let mut base = self.port;
         loop {
             if TcpListener::bind((self.address, base)).is_ok() {
                 return base;
@@ -52,9 +49,7 @@ impl Serve {
 
     /// Run the serve command
     pub fn run(&self) -> Result<()> {
-        let mut watch = self.watch.clone();
-        let livereload_port = self.pick();
-        watch.livereload(livereload_port);
+        let port = self.pick();
 
         let (tx, rx) = mpsc::channel::<Event>();
         let rx = Arc::new(Mutex::new(rx));
@@ -66,23 +61,20 @@ impl Serve {
                     let (mut tx, _) = socket.split();
                     if let Ok(rx) = rx.lock() {
                         if rx.recv().is_ok() {
-                            if let Err(e) = tokio::runtime::Handle::current()
-                                .block_on(tx.send(Message::text("reload")))
-                            {
-                                tracing::error!("failed to send reload message: {}", e);
-                            }
+                            let _ = tx.send(Message::text("reload"));
                         }
                     }
                 })
             });
 
-        let manifest = watch.manifest()?;
+        let manifest = self.watch.manifest()?;
+        let watcher = self.watch.clone();
         let cydonia = warp::serve(warp::fs::dir(manifest.out.clone()).or(livereload))
-            .run((self.address, self.port));
+            .run((self.address, port));
 
         Runtime::new()?.block_on(async {
-            tracing::info!("listening on http://{}:{} ...", self.address, self.port);
-            let watcher = tokio::task::spawn_blocking(move || watch.watch(manifest, tx));
+            tracing::info!("listening on http://{}:{} ...", self.address, port);
+            let watcher = tokio::task::spawn_blocking(move || watcher.watch(manifest, tx));
 
             if let Err(e) = futures::select! {
                 r = cydonia.fuse() => Ok(r),
