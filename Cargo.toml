@@ -22,9 +22,10 @@ tracing = "0.1.40"
 # Optional features for the cli
 ccli = { version = "0.0.1", optional = true }
 notify = { version = "6.1.1", optional = true }
-tokio = { version = "1.35.1", optional = true }
+tokio = { version = "1.35.1", features = [ "rt-multi-thread" ], optional = true }
 warp = { version = "0.3.6", optional = true }
+futures = { version = "0.3.30", optional = true }
 
 [features]
 default = [ "cli" ]
-cli = [ "ccli", "notify", "tokio", "warp" ]
+cli = [ "ccli", "futures", "notify", "tokio", "warp" ]

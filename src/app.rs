@@ -24,6 +24,8 @@ use std::{
 pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
+    /// Port for the livereload server.
+    pub livereload: Option<u16>,
     /// The cydonia.toml manifest.
     pub manifest: Manifest,
     /// The posts.
@@ -38,6 +40,7 @@ impl<'app> TryFrom<Manifest> for App<'app> {
     fn try_from(manifest: Manifest) -> Result<Self> {
         Ok(Self {
             handlebars: manifest.handlebars()?,
+            livereload: None,
             posts: manifest.posts()?,
             theme: manifest.theme()?,
             manifest,
@@ -46,6 +49,11 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 }
 
 impl<'app> App<'app> {
+    /// Set the port of the livereload server.
+    pub fn livereload(&mut self, port: u16) {
+        self.livereload = Some(port);
+    }
+
     /// Create a new app.
     pub fn load(root: impl AsRef<Path>) -> Result<Self> {
         tracing::info!("loading app from {} ...", root.as_ref().display());
@@ -54,10 +62,7 @@ impl<'app> App<'app> {
 
     /// Render the site.
     pub fn render(&self) -> Result<()> {
-        tracing::info!(
-            "files changed, rendering the site to {} ...",
-            self.manifest.out.display()
-        );
+        tracing::info!("rendering the site to {} ...", self.manifest.out.display());
         tracing::debug!("creating output directory ...");
         fs::create_dir_all(&self.manifest.out)?;
         self.manifest.copy_public()?;

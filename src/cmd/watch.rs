@@ -1,6 +1,6 @@
 //! command new
 
-use crate::App;
+use crate::{App, Manifest};
 use anyhow::Result;
 use ccli::{clap, clap::Parser};
 use notify::{
@@ -11,10 +11,11 @@ use std::{
     path::PathBuf,
     sync::mpsc::{self, Sender},
     thread,
+    time::Duration,
 };
 
 /// Watch command
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 pub struct Watch {
     /// The root of the cydonia site
     #[clap(default_value = ".")]
@@ -23,27 +24,43 @@ pub struct Watch {
     /// The output directory
     #[clap(short, long, default_value = "out")]
     pub out: PathBuf,
+
+    /// The port of the livereload server
+    #[clap(skip)]
+    livereload: Option<u16>,
 }
 
 impl Watch {
-    /// Watch the given directory.
-    pub fn watch(&self, tx: Sender<Event>) -> Result<()> {
-        let mut app = App::load(&self.dir)?;
-        if self.out.is_absolute() {
-            app.manifest.out = self.out.clone();
-        } else if self.out != PathBuf::from("out") {
-            let out = self.dir.join("out");
-            app.manifest.out = out.clone();
+    /// Set the livereload port.
+    pub fn livereload(&mut self, port: u16) {
+        self.livereload = Some(port);
+    }
+
+    /// Make the output directory absolute.
+    pub fn manifest(&self) -> Result<Manifest> {
+        let mut manifest = Manifest::load(&self.dir)?;
+        if self.out.is_absolute() || self.out != PathBuf::from("out") {
+            manifest.out = self.out.clone();
         }
 
+        Ok(manifest)
+    }
+
+    /// Watch the given directory.
+    pub fn watch(&self, manifest: Manifest, tx: Sender<Event>) -> Result<()> {
+        let mut app: App<'_> = manifest.try_into()?;
+        if let Some(port) = self.livereload {
+            app.livereload(port);
+        }
         app.render()?;
+
         tracing::info!(
-            "watching {} -> {}",
+            "watching {} -> {} ...",
             self.dir.display(),
             app.manifest.out.display()
         );
 
-        let cloned_app = app.clone();
+        let paths = app.manifest.paths();
         let mut watcher =
             notify::recommended_watcher(move |res: notify::Result<Event>| match res {
                 Ok(event) => {
@@ -52,7 +69,7 @@ impl Watch {
                         return;
                     }
 
-                    if let Err(e) = cloned_app.render() {
+                    if let Err(e) = app.render() {
                         tracing::error!("render failed: {:?}", e);
                     }
 
@@ -63,18 +80,22 @@ impl Watch {
                 Err(e) => tracing::error!("watch error: {:?}", e),
             })?;
 
-        for path in app.manifest.paths() {
+        for path in paths {
             if !path.exists() {
                 continue;
             }
             watcher.watch(&path, notify::RecursiveMode::Recursive)?;
         }
 
-        loop {}
+        loop {
+            thread::sleep(Duration::from_secs(u64::MAX));
+        }
     }
 
     /// Init project in the given directory.
     pub fn run(&self) -> Result<()> {
+        let manifest = self.manifest()?;
+
         let (tx, rx) = mpsc::channel::<Event>();
         thread::spawn(move || loop {
             if let Err(e) = rx.recv() {
@@ -82,6 +103,6 @@ impl Watch {
             }
         });
 
-        self.watch(tx)
+        self.watch(manifest, tx)
     }
 }
