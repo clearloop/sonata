@@ -139,7 +139,7 @@ impl FromStr for Meta {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Index {
     /// If this post is the last post of the year.
-    pub last: bool,
+    pub year: String,
 
     /// The index of the post.
     pub index: String,

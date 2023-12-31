@@ -114,7 +114,6 @@ impl<'app> App<'app> {
 
     /// Render post.
     pub fn render_post(&self, post: Post) -> Result<()> {
-        post.path.file_name().unwrap_or_default();
         self.render_template(
             PathBuf::from(&post.index.link),
             "post",
