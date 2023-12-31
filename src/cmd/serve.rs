@@ -2,6 +2,7 @@
 
 use crate::{cmd::Watch, LIVERELOAD_ENDPOINT};
 use anyhow::Result;
+use async_lock::Mutex;
 use ccli::{clap, clap::Parser};
 use futures::{sink::SinkExt, FutureExt, StreamExt};
 use notify::Event;
@@ -9,7 +10,7 @@ use std::{
     net::{Ipv4Addr, TcpListener},
     sync::{
         mpsc::{self, Receiver},
-        Arc, Mutex,
+        Arc,
     },
 };
 use tokio::runtime::Runtime;
@@ -59,9 +60,10 @@ impl Serve {
             .map(|ws: Ws, rx: Arc<Mutex<Receiver<Event>>>| {
                 ws.on_upgrade(move |socket: WebSocket| async move {
                     let (mut tx, _) = socket.split();
-                    if let Ok(rx) = rx.lock() {
-                        if rx.recv().is_ok() {
-                            let _ = tx.send(Message::text("reload"));
+                    let rx = rx.lock().await;
+                    if rx.recv().is_ok() {
+                        if let Err(e) = tx.send(Message::text("reload")).await {
+                            tracing::error!("failed to send reload message: {}", e);
                         }
                     }
                 })

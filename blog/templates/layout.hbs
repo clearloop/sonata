@@ -14,7 +14,6 @@
       <script>
        const socket = new WebSocket(`ws://${location.host}` + "/" + "{{{ livereload }}}");
        socket.onmessage = function (event) {
-         console.log(event)
          if (event.data === "reload") {
            socket.close();
            location.reload();
