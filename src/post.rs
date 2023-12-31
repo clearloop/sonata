@@ -4,6 +4,7 @@ use crate::utils::Read;
 use anyhow::{anyhow, Result};
 use chrono::NaiveDate;
 use colored::Colorize;
+use pulldown_cmark::{html, Options, Parser};
 use serde::{Deserialize, Serialize};
 use std::{
     path::{Path, PathBuf},
@@ -13,18 +14,17 @@ use std::{
 /// Post layout with is markdown with yaml metadata.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Post {
-    /// The path to the post.
-    #[serde(skip)]
-    pub path: PathBuf,
-    /// The metadata of the post.
-    #[serde(flatten)]
-    pub meta: Meta,
     /// The content of the post in markdown.
     pub content: String,
     /// The index of the post.
-    pub index: String,
-    /// If this is the last post of the year.
-    pub last: bool,
+    #[serde(flatten)]
+    pub index: Index,
+    /// The metadata of the post.
+    #[serde(flatten)]
+    pub meta: Meta,
+    /// The path to the post.
+    #[serde(skip)]
+    pub path: PathBuf,
 }
 
 impl Post {
@@ -75,8 +75,14 @@ impl Post {
             });
         }
 
-        self.index = self.meta.date.format("%h. %d").to_string();
-        Ok(self)
+        Ok(self.index(name))
+    }
+
+    /// Generate the index of the post.
+    pub fn index(mut self, name: String) -> Self {
+        self.index.index = self.meta.date.format("%h. %d").to_string();
+        self.index.link = format!("posts/{name}.html");
+        self
     }
 }
 
@@ -93,7 +99,8 @@ impl FromStr for Post {
         }
 
         let meta = markdown[1].parse::<Meta>()?;
-        let content = markdown[2].to_string();
+        let mut content = String::new();
+        html::push_html(&mut content, Parser::new_ext(markdown[2], Options::all()));
 
         Ok(Self {
             meta,
@@ -127,4 +134,16 @@ impl FromStr for Meta {
     fn from_str(s: &str) -> Result<Self> {
         serde_yaml::from_str(s).map_err(|e| anyhow::anyhow!(e))
     }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct Index {
+    /// If this post is the last post of the year.
+    pub last: bool,
+
+    /// The index of the post.
+    pub index: String,
+
+    /// The link of the post.
+    pub link: String,
 }

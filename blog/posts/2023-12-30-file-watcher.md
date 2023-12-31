@@ -5,9 +5,13 @@ labels: [cydonia]
 title: The file watcher implementation in cydonia.
 ---
 
-## hello
+# hello
 
-fffffffffffffffffff
-ffffffffffffffffff
+```rust
+// function block.
 
-ffffff
+/// main function
+fn main() {
+  println!("hello, world");
+}
+```

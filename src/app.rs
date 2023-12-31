@@ -11,12 +11,12 @@
 //!     - theme.css
 //! ```
 
-use crate::{Manifest, Post, Theme};
+use crate::{Manifest, Post};
 use anyhow::Result;
 use handlebars::Handlebars;
 use std::{
     fs::{self, File},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 /// The endpoint for livereload
@@ -33,8 +33,6 @@ pub struct App<'app> {
     pub manifest: Manifest,
     /// The posts.
     pub posts: Vec<Post>,
-    /// The theme.
-    pub theme: Theme,
 }
 
 impl<'app> TryFrom<Manifest> for App<'app> {
@@ -48,7 +46,6 @@ impl<'app> TryFrom<Manifest> for App<'app> {
             handlebars,
             livereload: None,
             posts: manifest.posts()?,
-            theme: manifest.theme()?,
             manifest,
         })
     }
@@ -78,6 +75,7 @@ impl<'app> App<'app> {
         self.render_css()?;
 
         let posts = self.manifest.posts()?;
+        self.render_posts(posts.clone())?;
         self.render_index(posts)?;
         Ok(())
     }
@@ -85,8 +83,9 @@ impl<'app> App<'app> {
     /// Write css to the output directory.
     pub fn render_css(&self) -> Result<()> {
         tracing::debug!("rendering css ...");
-        fs::write(self.manifest.out.join("index.css"), &self.theme.index)?;
-        fs::write(self.manifest.out.join("post.css"), &self.theme.post).map_err(Into::into)
+        let theme = self.manifest.theme()?;
+        fs::write(self.manifest.out.join("index.css"), &theme.index)?;
+        fs::write(self.manifest.out.join("post.css"), &theme.post).map_err(Into::into)
     }
 
     /// Render the index page.
@@ -101,6 +100,29 @@ impl<'app> App<'app> {
                 "posts": posts,
             }),
         )
+    }
+
+    /// Render post.
+    pub fn render_post(&self, post: Post) -> Result<()> {
+        post.path.file_name().unwrap_or_default();
+        self.render_template(
+            PathBuf::from(&post.index.link),
+            "post",
+            serde_json::json!({
+                "title": self.manifest.title,
+                "livereload": self.livereload,
+                "post": post,
+            }),
+        )
+    }
+
+    /// Render the posts.
+    pub fn render_posts(&self, posts: Vec<Post>) -> Result<()> {
+        fs::create_dir_all(self.manifest.out.join("posts"))?;
+        for post in posts {
+            self.render_post(post)?;
+        }
+        Ok(())
     }
 
     /// Render a template.
