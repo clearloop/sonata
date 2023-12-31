@@ -67,6 +67,8 @@ impl<'app> App<'app> {
     }
 
     /// Render the site.
+    ///
+    /// TODO: render specified modules.
     pub fn render(&mut self) -> Result<()> {
         tracing::info!("rendering the site to {} ...", self.manifest.out.display());
         fs::create_dir_all(&self.manifest.out)?;
@@ -106,7 +108,8 @@ impl<'app> App<'app> {
         data: serde_json::Value,
     ) -> Result<()> {
         let path = self.manifest.out.join(name);
-        tracing::debug!("rendering {} ...", path.display());
+        tracing::debug!("rendering {path:?} ...");
+
         let file = File::create(path)?;
         self.handlebars.render_to_write(template, &data, file)?;
         Ok(())
