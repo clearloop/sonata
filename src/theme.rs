@@ -5,6 +5,8 @@ use anyhow::Result;
 use std::path::Path;
 
 /// The theme for the site.
+///
+/// TODO: not loading theme to memory.
 #[derive(Debug, Default, Clone)]
 pub struct Theme {
     /// Styles for the index page.

@@ -11,7 +11,10 @@
 //!     - theme.css
 //! ```
 
-use crate::{utils, Manifest, Post};
+use crate::{
+    utils::{self, Prefix},
+    Manifest, Post,
+};
 use anyhow::Result;
 use handlebars::Handlebars;
 use std::{
@@ -64,38 +67,33 @@ impl<'app> App<'app> {
         Manifest::load(root)?.try_into()
     }
 
+    /// Conditonal render the site
+    pub fn conditonal_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
+        for path in paths {
+            if self.manifest.posts.is_sub(&path)? {
+                self.render_post(Post::load(&path)?)?;
+            } else if self.manifest.theme.is_sub(&path)? {
+                self.render_theme()?;
+            } else if self.manifest.public.is_sub(&path)? {
+                self.manifest.copy_public()?;
+            }
+        }
+
+        let posts = self.manifest.posts()?;
+        self.render_index(posts)
+    }
+
     /// Render the site.
-    ///
-    /// TODO: render specified modules.
     pub fn render(&mut self) -> Result<()> {
-        tracing::info!("rendering the site to {} ...", self.manifest.out.display());
         fs::create_dir_all(&self.manifest.out)?;
         self.handlebars
             .register_templates_directory(&self.manifest.templates, Default::default())?;
         self.manifest.copy_public()?;
-        self.render_css()?;
+        self.render_theme()?;
 
         let posts = self.manifest.posts()?;
         self.render_posts(posts.clone())?;
-        self.render_index(posts)?;
-        Ok(())
-    }
-
-    /// Write css to the output directory.
-    pub fn render_css(&self) -> Result<()> {
-        let theme = self.manifest.theme()?;
-        fs::write(self.manifest.out.join("index.css"), &theme.index)?;
-        fs::write(self.manifest.out.join("post.css"), &theme.post)?;
-
-        // Copy highlight.{css, js}
-        for hl in ["highlight.js", "highlight.css"] {
-            let path = self.manifest.theme.join(hl);
-            if path.exists() {
-                fs::copy(path, self.manifest.out.join(hl))?;
-            }
-        }
-
-        Ok(())
+        self.render_index(posts)
     }
 
     /// Render the index page.
@@ -131,6 +129,23 @@ impl<'app> App<'app> {
         for post in posts {
             self.render_post(post)?;
         }
+        Ok(())
+    }
+
+    /// Write theme to the output directory.
+    pub fn render_theme(&self) -> Result<()> {
+        let theme = self.manifest.theme()?;
+        fs::write(self.manifest.out.join("index.css"), &theme.index)?;
+        fs::write(self.manifest.out.join("post.css"), &theme.post)?;
+
+        // Copy highlight.{css, js}
+        for hl in ["highlight.js", "highlight.css"] {
+            let path = self.manifest.theme.join(hl);
+            if path.exists() {
+                fs::copy(path, self.manifest.out.join(hl))?;
+            }
+        }
+
         Ok(())
     }
 

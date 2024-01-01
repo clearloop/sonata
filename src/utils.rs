@@ -4,7 +4,10 @@ use anyhow::Result;
 use colored::Colorize;
 use once_cell::sync::Lazy;
 use regex::{Captures, Regex};
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 static CODE_BLOCK_RE: Lazy<Regex> =
     Lazy::new(|| Regex::new(r##"((?s)<code.*?>(.*?)</code>)"##).unwrap());
@@ -32,12 +35,26 @@ where
 }
 
 /// Extension trait for `PathBuf`.
-pub trait Prefix {
+pub trait Prefix: AsRef<Path> + Sized {
+    /// If the target path is a sub path of self.
+    fn is_sub(&self, path: impl AsRef<Path>) -> Result<bool>;
+
     /// Prefix self with another path.
     fn prefix(&mut self, prefix: impl AsRef<Path>);
 }
 
 impl Prefix for PathBuf {
+    fn is_sub(&self, path: impl AsRef<Path>) -> Result<bool> {
+        let ancestor = fs::canonicalize(self)?;
+        let sub = fs::canonicalize(path)?;
+
+        Ok(sub
+            .as_os_str()
+            .to_string_lossy()
+            .to_string()
+            .contains(ancestor.as_os_str().to_string_lossy().to_string().as_str()))
+    }
+
     fn prefix(&mut self, prefix: impl AsRef<Path>) {
         if self.is_relative() {
             *self = prefix.as_ref().join(&self)

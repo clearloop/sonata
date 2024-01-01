@@ -12,6 +12,8 @@ use std::{
 };
 
 /// Post layout with is markdown with yaml metadata.
+///
+/// TODO: load posts from any directory.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Post {
     /// The content of the post in markdown.
