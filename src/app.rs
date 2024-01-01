@@ -172,11 +172,9 @@ impl<'app> App<'app> {
 
     /// Write theme to the output directory.
     pub fn render_theme(&self) -> Result<()> {
-        let theme = self.manifest.theme()?;
-        fs::write(self.manifest.out.join("index.css"), &theme.index)?;
-        fs::write(self.manifest.out.join("post.css"), &theme.post)?;
+        self.manifest.theme()?.write(&self.manifest.out)?;
 
-        // Copy highlight.{css, js}
+        // Override highlight.{css, js} if exist
         for hl in ["highlight.js", "highlight.css"] {
             let path = self.manifest.theme.join(hl);
             if path.exists() {
