@@ -37,6 +37,30 @@ templates = "templates"   # The path to the templates.
 theme = "theme.css"
 ```
 
+## Github Action
+
+> [!WARNING]
+>
+> This action currently not woring, plz wait for `0.0.3`
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: clearloop/cydonia@0
+      - run: cydonia build blog
+```
+
 ## LICENSE
 
 GPL-3.0-only

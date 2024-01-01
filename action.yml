@@ -10,6 +10,7 @@ runs:
         path: ~/.cargo/bin/cydonia
         key: ${{ runner.os }}-cydonia
     - name: Install cydonia
+      shell: bash
       run: |
         BIN=~/.cargo/bin/cydonia
         if [ ! -f BIN ]; then
