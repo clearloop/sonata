@@ -1,9 +1,16 @@
 {
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
-    "tailwindcss": "^3.4.0"
+    "css-loader": "^6.8.1",
+    "highlight.js": "^11.9.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "tailwindcss": "^3.4.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --watch --minify"
+    "default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --minify",
+    "watch:default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --watch",
+    "build": "yarn && yarn default && webpack build"
   }
 }

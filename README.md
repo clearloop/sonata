@@ -1,27 +1,71 @@
 ## Cydonia
 
-The static site generator in rust.
+[![cydonia][version-badge]][version-link]
+[![ci][ci-badge]][ci-link]
+
+The static site generator.
+
+For the minimal directory layout:
+
+```
+.
+├── cydonia.toml
+└── posts
+    └── 2024-01-01-hello-world.md
+```
+
+The full configuration:
 
 ```toml
 # my-blog/cydonia.toml
-title = "Cydonia"          # The name of the site.
+title = "Cydonia"         # The title of the site.
 
 # Default values of the optional fields.
 # --------------------------------------
-
-favicon = "favicon.ico"   # The path to the favicon.ico.
+favicon = "favicon.svg"   # The path to the favicon.
+out = "out"               # The path to the output directory.
 posts = "posts"           # The path to the posts.
+public = "public"         # The path to the public directory.
 templates = "templates"   # The path to the templates.
 
 # Theme could also be a folder:
 #
 # - [theme]
-#   - index.css (required)
-#   - post.css  (required)
+#   - index.css (optional)
+#   - post.css  (optional)
 #   - theme.css (optional)
 theme = "theme.css"
+```
+
+## Github Action
+
+> [!WARNING]
+>
+> This action currently not woring, plz wait for `0.0.3`
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: clearloop/cydonia@0
+      - run: cydonia build blog
 ```
 
 ## LICENSE
 
 GPL-3.0-only
+
+[version-badge]: https://img.shields.io/crates/v/cydonia
+[version-link]: https://docs.rs/cydonia
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml
+[ci-link]: https://github.com/clearloop/cydonia/actions/workflows/main.yml

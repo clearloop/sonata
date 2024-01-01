@@ -4,6 +4,11 @@ use crate::utils::Read;
 use anyhow::Result;
 use std::path::Path;
 
+/// The pre-compiled highlight.js.
+pub const HIGHLIGHT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.js"));
+/// The pre-compiled highlight.css.
+pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
+
 /// The theme for the site.
 ///
 /// TODO: not loading theme to memory.
@@ -41,5 +46,17 @@ impl Theme {
                 post: [theme, path.join("post.css").read().unwrap_or_default()].concat(),
             })
         }
+    }
+
+    /// Writes the theme to the given path.
+    pub fn write(&self, out: impl AsRef<Path>) -> Result<()> {
+        let out = out.as_ref();
+
+        std::fs::write(out.join("index.css"), &self.index)?;
+        std::fs::write(out.join("post.css"), &self.post)?;
+        std::fs::write(out.join("highlight.js"), HIGHLIGHT_JS)?;
+        std::fs::write(out.join("highlight.css"), HIGHLIGHT_CSS)?;
+
+        Ok(())
     }
 }

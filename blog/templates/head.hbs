@@ -1,0 +1,49 @@
+<head>
+    <title>{{ tab }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="description" content="Empowering everyone to build reliable and efficient static site.">
+
+    <!-- twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{tab}}">
+    <meta name="twitter:image" content="https://github.com/clearloop/cydonia/releases/download/v0.0.2-pre/cydonia.svg">
+    <!-- <meta name="twitter:site" content="@cydonia"> -->
+    <!-- <meta name="twitter:creator" content="@cydonia"> -->
+    <!-- <meta name="twitter:description" content="{{ tab }}"> -->
+
+    <!-- favicon -->
+    {{#if favicon}}
+        <link rel="shortcut icon" href="{{ favicon }}">
+    {{/if}}
+
+    <!-- styles for index -->
+    {{#if posts}}
+        <link rel="stylesheet" href="/index.css">
+    {{/if}}
+
+    <!-- styles for post -->
+    {{#if post}}
+        <link rel="stylesheet" href="/highlight.css">
+        <link rel="stylesheet" href="/post.css">
+        <script src="/highlight.js" defer></script>
+    {{/if}}
+
+
+    <!-- livereload -->
+    {{#if livereload}}
+        <script>
+             const socket = new WebSocket(`ws://${location.host}` + "/" + "{{{ livereload }}}");
+         socket.onmessage = function (event) {
+             if (event.data === "reload") {
+                 socket.close();
+                 location.reload();
+             }
+         };
+
+         window.onbeforeunload = function() {
+             socket.close();
+         }
+        </script>
+    {{/if}}
+</head>
