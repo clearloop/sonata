@@ -13,7 +13,7 @@
 
 use crate::{
     utils::{Prefix, Read},
-    Manifest, Post,
+    Manifest, Post, Templates,
 };
 use anyhow::Result;
 use handlebars::Handlebars;
@@ -46,6 +46,7 @@ impl<'app> TryFrom<Manifest> for App<'app> {
         let mut handlebars = Handlebars::new();
         handlebars.set_prevent_indent(true);
         handlebars.set_strict_mode(true);
+        handlebars.register_embed_templates::<Templates>()?;
 
         Ok(Self {
             handlebars,
@@ -106,8 +107,7 @@ impl<'app> App<'app> {
             } else if self.manifest.templates.is_sub(&path)? {
                 tracing::info!("reloading templates ...");
                 templates_changed = true;
-                self.handlebars
-                    .register_templates_directory(&self.manifest.templates, Default::default())?;
+                self.register_templates()?;
             }
         }
 
@@ -118,12 +118,21 @@ impl<'app> App<'app> {
         self.render_index(posts)
     }
 
+    /// Register templates if exist.
+    pub fn register_templates(&mut self) -> Result<()> {
+        if self.manifest.templates.exists() {
+            self.handlebars
+                .register_templates_directory(&self.manifest.templates, Default::default())?;
+        }
+
+        Ok(())
+    }
+
     /// Render the site.
     pub fn render(&mut self) -> Result<()> {
         fs::create_dir_all(&self.manifest.out)?;
-        self.handlebars
-            .register_templates_directory(&self.manifest.templates, Default::default())?;
         self.manifest.copy_public()?;
+        self.register_templates()?;
         self.render_theme()?;
 
         let posts = self.manifest.posts()?;

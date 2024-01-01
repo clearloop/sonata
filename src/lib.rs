@@ -13,3 +13,8 @@ pub use self::{
     post::{Meta, Post},
     theme::Theme,
 };
+
+/// The default cydonia templates.
+#[derive(rust_embed::RustEmbed)]
+#[folder = "blog/templates"]
+pub struct Templates;
