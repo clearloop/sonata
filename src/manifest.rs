@@ -5,6 +5,7 @@ use crate::{
     Post, Theme,
 };
 use anyhow::Result;
+use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 use std::{
     fs,
@@ -24,7 +25,7 @@ pub struct Manifest {
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon"))]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.svg"))]
     pub favicon: PathBuf,
 
     /// The output directory.
@@ -121,9 +122,26 @@ impl Manifest {
 
     /// Get the posts.
     pub fn posts(&self) -> Result<Vec<Post>> {
-        fs::read_dir(&self.posts)?
+        let mut posts = fs::read_dir(&self.posts)?
             .map(|e| Post::load(e?.path()))
-            .collect()
+            .collect::<Result<Vec<_>>>()?;
+
+        if posts.is_empty() {
+            return Ok(posts);
+        }
+
+        posts.sort_by(|a, b| b.meta.date.cmp(&a.meta.date));
+
+        let mut current_year = posts[0].meta.date.year() + 1;
+        posts.iter_mut().for_each(|post| {
+            let year = post.meta.date.year();
+            if year < current_year {
+                post.index.year = post.meta.date.format("%Y").to_string();
+                current_year = year;
+            }
+        });
+
+        Ok(posts)
     }
 
     /// Get the theme.
@@ -146,9 +164,9 @@ impl Manifest {
 mod default {
     use std::{fs, path::PathBuf};
 
-    /// Default implementation of the out directory.
+    /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
-        fs::canonicalize(PathBuf::from("favicon")).unwrap_or_default()
+        fs::canonicalize(PathBuf::from("favicon.svg")).unwrap_or_default()
     }
 
     /// Default implementation of the out directory.

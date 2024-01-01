@@ -3,9 +3,15 @@
     <table class="table-auto max-w-full text-2xl">
       <tbody>
       {{#each posts}}
+          {{#if year}}
+          <tr>
+            <td class="px-8 py-3 text-gray-500"></td>
+            <td class="py-8 text-4xl font-bold">Posts in {{{ year }}}</td>
+          </tr>
+          {{/if}}
           <tr>
             <td class="px-6 py-3 text-gray-500">{{{ index }}}</td>
-            <td><a href="{{{ link }}}">{{{ title }}}</a></td>
+            <td class="hover:underline"><a href="{{{ link }}}">{{{ title }}}</a></td>
           </tr>
       {{/each}}
       </tbody>

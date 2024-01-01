@@ -58,7 +58,7 @@ impl Watch {
                         return;
                     }
 
-                    if let Err(e) = app.render() {
+                    if let Err(e) = app.conditional_render(event.paths.clone()) {
                         tracing::error!("render failed: {:?}", e);
                     }
 
