@@ -33,6 +33,8 @@ pub struct App<'app> {
     pub handlebars: Handlebars<'app>,
     /// The cydonia.toml manifest.
     pub manifest: Manifest,
+    /// Whether to enable livereload.
+    pub livereload: bool,
     /// The posts.
     pub posts: Vec<Post>,
 }
@@ -47,6 +49,7 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 
         Ok(Self {
             handlebars,
+            livereload: false,
             posts: manifest.posts()?,
             manifest,
         })
@@ -58,6 +61,11 @@ impl<'app> App<'app> {
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
         map.insert("title".into(), self.manifest.title.clone().into());
+
+        if self.livereload {
+            map.insert("livereload".into(), LIVERELOAD_ENDPOINT.into());
+        }
+
         if self.manifest.favicon.exists() {
             map.insert(
                 "favicon".into(),
@@ -72,11 +80,9 @@ impl<'app> App<'app> {
         Ok(map.into())
     }
 
-    /// Set the port of the livereload server.
-    pub fn livereload(&mut self) -> Result<()> {
-        self.handlebars
-            .register_template_string("livereload", LIVERELOAD_ENDPOINT)
-            .map_err(Into::into)
+    /// Enable livereload.
+    pub fn livereload(&mut self) {
+        self.livereload = true;
     }
 
     /// Create a new app.
@@ -87,6 +93,7 @@ impl<'app> App<'app> {
 
     /// Conditional render the site
     pub fn conditional_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
+        let mut templates_changed = false;
         for path in paths {
             if self.manifest.posts.is_sub(&path)? {
                 self.render_post(Post::load(&path)?)?;
@@ -97,12 +104,17 @@ impl<'app> App<'app> {
             } else if self.manifest.favicon.is_sub(&path)? {
                 self.render_favicon()?;
             } else if self.manifest.templates.is_sub(&path)? {
+                tracing::info!("reloading templates ...");
+                templates_changed = true;
                 self.handlebars
                     .register_templates_directory(&self.manifest.templates, Default::default())?;
             }
         }
 
         let posts = self.manifest.posts()?;
+        if templates_changed {
+            self.render_posts(posts.clone())?;
+        }
         self.render_index(posts)
     }
 
@@ -183,8 +195,7 @@ impl<'app> App<'app> {
         data: Value,
     ) -> Result<()> {
         let path = self.manifest.out.join(name);
-        tracing::debug!("rendering {path:?} ...");
-
+        tracing::info!("rendering {path:?} ...");
         self.handlebars
             .render_to_write(template, &self.data(data)?, File::create(path)?)
             .map_err(Into::into)
