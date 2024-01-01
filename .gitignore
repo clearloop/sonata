@@ -1,7 +1,7 @@
-node_modules
-out
+**/*node_modules
 /target
 .log
 .DS_Store
+blog/out
 blog/theme
 blog/favicon.svg

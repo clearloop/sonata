@@ -12,12 +12,13 @@ fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=blog/theme");
 
     let out = std::env::var("OUT_DIR")?;
-    let Ok(yarn) = which::which("yarn") else {
+    let yarn = which::which("yarn");
+    if yarn.is_err() || std::env::var("SKIP_THEME").is_ok() {
         return build_no_yarn(&out);
-    };
+    }
 
     // Build default theme
-    if !Command::new(yarn).arg("build").status()?.success() {
+    if !Command::new(yarn?).arg("build").status()?.success() {
         return Err(anyhow!("build default theme failed."));
     }
 

@@ -1,5 +1,8 @@
 ## Cydonia
 
+[![zink][version-badge]][version-link]
+[![ci][ci-badge]][ci-link]
+
 The static site generator.
 
 For the minimal directory layout:
@@ -37,3 +40,8 @@ theme = "theme.css"
 ## LICENSE
 
 GPL-3.0-only
+
+[version-badge]: https://img.shields.io/crates/v/cydonia
+[version-link]: https://docs.rs/cydonia
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml
+[ci-link]: https://github.com/clearloop/cydonia/actions/workflows/main.yml
