@@ -40,7 +40,7 @@ impl Watch {
     /// Watch the given directory.
     pub fn watch(&self, manifest: Manifest, tx: Sender<Event>) -> Result<()> {
         let mut app: App<'_> = manifest.try_into()?;
-        app.livereload();
+        app.livereload()?;
         app.render()?;
 
         tracing::info!(
@@ -58,7 +58,7 @@ impl Watch {
                         return;
                     }
 
-                    if let Err(e) = app.conditonal_render(event.paths.clone()) {
+                    if let Err(e) = app.conditional_render(event.paths.clone()) {
                         tracing::error!("render failed: {:?}", e);
                     }
 

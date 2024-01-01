@@ -2,18 +2,16 @@
 
 use anyhow::Result;
 use colored::Colorize;
-use once_cell::sync::Lazy;
-use regex::{Captures, Regex};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
 
-static CODE_BLOCK_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r##"((?s)<code.*?>(.*?)</code>)"##).unwrap());
-
 /// A trait for reading file with full error info.
 pub trait Read: Sized {
+    /// Get file name with proper error info.
+    fn file_name(&self) -> Result<String>;
+
     /// Read self to string with proper error info.
     fn read(&self) -> Result<String>;
 }
@@ -22,6 +20,13 @@ impl<P> Read for P
 where
     P: AsRef<Path>,
 {
+    fn file_name(&self) -> Result<String> {
+        self.as_ref()
+            .file_name()
+            .ok_or_else(|| anyhow::anyhow!("Failed to get file name: {}", self.as_ref().display()))
+            .map(|s| s.to_string_lossy().to_string())
+    }
+
     fn read(&self) -> Result<String> {
         let path = self.as_ref();
         std::fs::read_to_string(path).map_err(|e| {
@@ -60,16 +65,4 @@ impl Prefix for PathBuf {
             *self = prefix.as_ref().join(&self)
         }
     }
-}
-
-/// Fix code block in html.
-pub fn fix_code_block(html: &str) -> String {
-    CODE_BLOCK_RE
-        .replace_all(html, |caps: &Captures| {
-            caps[1].replace(
-                &caps[2],
-                &caps[2].trim().replace(&format!("{:<6}", "\n"), "\n"),
-            )
-        })
-        .into()
 }

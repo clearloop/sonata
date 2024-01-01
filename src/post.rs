@@ -34,18 +34,12 @@ impl Post {
     pub fn load(path: impl AsRef<Path>) -> Result<Self> {
         let mut this: Self = path.read()?.parse()?;
         this.path = path.as_ref().to_path_buf();
-        this.merge_date()
+        this.merge_meta()
     }
 
     /// Merge date from the post metadata.
-    pub fn merge_date(mut self) -> Result<Self> {
-        let name = self
-            .path
-            .with_extension("")
-            .file_name()
-            .ok_or_else(|| anyhow!("failed to get the file name of post {:?}", self.path))?
-            .to_string_lossy()
-            .to_string();
+    pub fn merge_meta(mut self) -> Result<Self> {
+        let name = self.path.with_extension("").file_name()?;
         let meta = name.splitn(4, '-').collect::<Vec<_>>();
         if meta.len() != 4 {
             return Err(anyhow::anyhow!(

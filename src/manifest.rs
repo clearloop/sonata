@@ -25,7 +25,7 @@ pub struct Manifest {
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon"))]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.svg"))]
     pub favicon: PathBuf,
 
     /// The output directory.
@@ -164,9 +164,9 @@ impl Manifest {
 mod default {
     use std::{fs, path::PathBuf};
 
-    /// Default implementation of the out directory.
+    /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
-        fs::canonicalize(PathBuf::from("favicon")).unwrap_or_default()
+        fs::canonicalize(PathBuf::from("favicon.svg")).unwrap_or_default()
     }
 
     /// Default implementation of the out directory.

@@ -12,14 +12,14 @@
 //! ```
 
 use crate::{
-    utils::{self, Prefix},
+    utils::{Prefix, Read},
     Manifest, Post,
 };
 use anyhow::Result;
 use handlebars::Handlebars;
+use serde_json::{Map, Value};
 use std::{
     fs::{self, File},
-    io::Write,
     path::{Path, PathBuf},
 };
 
@@ -31,8 +31,6 @@ pub const LIVERELOAD_ENDPOINT: &str = "__livereload";
 pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
-    /// Port for the livereload server.
-    pub livereload: Option<&'static str>,
     /// The cydonia.toml manifest.
     pub manifest: Manifest,
     /// The posts.
@@ -44,11 +42,11 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 
     fn try_from(manifest: Manifest) -> Result<Self> {
         let mut handlebars = Handlebars::new();
+        handlebars.set_prevent_indent(true);
         handlebars.set_strict_mode(true);
 
         Ok(Self {
             handlebars,
-            livereload: None,
             posts: manifest.posts()?,
             manifest,
         })
@@ -56,9 +54,29 @@ impl<'app> TryFrom<Manifest> for App<'app> {
 }
 
 impl<'app> App<'app> {
+    /// Make initial data for templates
+    pub fn data(&self, mut value: Value) -> Result<Value> {
+        let mut map = Map::<String, Value>::new();
+        map.insert("title".into(), self.manifest.title.clone().into());
+        if self.manifest.favicon.exists() {
+            map.insert(
+                "favicon".into(),
+                format!("/{}", self.manifest.favicon.file_name()?).into(),
+            );
+        }
+
+        if let Some(data) = value.as_object_mut() {
+            map.append(data);
+        }
+
+        Ok(map.into())
+    }
+
     /// Set the port of the livereload server.
-    pub fn livereload(&mut self) {
-        self.livereload = Some(LIVERELOAD_ENDPOINT);
+    pub fn livereload(&mut self) -> Result<()> {
+        self.handlebars
+            .register_template_string("livereload", LIVERELOAD_ENDPOINT)
+            .map_err(Into::into)
     }
 
     /// Create a new app.
@@ -67,8 +85,8 @@ impl<'app> App<'app> {
         Manifest::load(root)?.try_into()
     }
 
-    /// Conditonal render the site
-    pub fn conditonal_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
+    /// Conditional render the site
+    pub fn conditional_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
         for path in paths {
             if self.manifest.posts.is_sub(&path)? {
                 self.render_post(Post::load(&path)?)?;
@@ -76,6 +94,11 @@ impl<'app> App<'app> {
                 self.render_theme()?;
             } else if self.manifest.public.is_sub(&path)? {
                 self.manifest.copy_public()?;
+            } else if self.manifest.favicon.is_sub(&path)? {
+                self.render_favicon()?;
+            } else if self.manifest.templates.is_sub(&path)? {
+                self.handlebars
+                    .register_templates_directory(&self.manifest.templates, Default::default())?;
             }
         }
 
@@ -96,17 +119,21 @@ impl<'app> App<'app> {
         self.render_index(posts)
     }
 
+    /// Render the favicon.
+    pub fn render_favicon(&self) -> Result<()> {
+        if self.manifest.favicon.exists() {
+            let favicon = self.manifest.favicon.file_name()?;
+            fs::copy(&self.manifest.favicon, self.manifest.out.join(favicon))?;
+        }
+        Ok(())
+    }
+
     /// Render the index page.
     pub fn render_index(&self, posts: Vec<Post>) -> Result<()> {
         self.render_template(
             "index.html",
             "index",
-            serde_json::json!({
-                "title": self.manifest.title,
-                "index": true,
-                "livereload": self.livereload,
-                "posts": posts,
-            }),
+            serde_json::json!({ "posts": posts, "tab": self.manifest.title }),
         )
     }
 
@@ -116,9 +143,8 @@ impl<'app> App<'app> {
             PathBuf::from(&post.index.link),
             "post",
             serde_json::json!({
-                "title": self.manifest.title,
-                "livereload": self.livereload,
                 "post": post,
+                "tab": post.meta.title,
             }),
         )
     }
@@ -154,15 +180,13 @@ impl<'app> App<'app> {
         &self,
         name: impl AsRef<Path>,
         template: &str,
-        data: serde_json::Value,
+        data: Value,
     ) -> Result<()> {
         let path = self.manifest.out.join(name);
         tracing::debug!("rendering {path:?} ...");
 
-        let mut file = File::create(path)?;
-        let mut rendered = self.handlebars.render(template, &data)?;
-        rendered = utils::fix_code_block(&rendered);
-        file.write_all(rendered.as_bytes())?;
-        Ok(())
+        self.handlebars
+            .render_to_write(template, &self.data(data)?, File::create(path)?)
+            .map_err(Into::into)
     }
 }
