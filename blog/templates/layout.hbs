@@ -1,40 +1,8 @@
 <html lang="en" class="dark dark:bg-black">
-  <head>
-    <title>{{ tab }}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="description" content="Empowering everyone to build reliable and efficient site.">
-    {{#if favicon}}
-    <link rel="shortcut icon" href="{{ favicon }}">
-    {{/if}}
-    {{#if posts}}
-      <link rel="stylesheet" href="/index.css">
-    {{/if}}
-    {{#if post}}
-        <link rel="stylesheet" href="/highlight.css">
-        <link rel="stylesheet" href="/post.css">
-        <script src="/highlight.js" defer></script>
-    {{/if}}
-    {{#if livereload}}
-      <script>
-       const socket = new WebSocket(`ws://${location.host}` + "/" + "{{{ livereload }}}");
-       socket.onmessage = function (event) {
-         if (event.data === "reload") {
-           socket.close();
-           location.reload();
-         }
-       };
-
-       window.onbeforeunload = function() {
-         socket.close();
-       }
-      </script>
-    {{/if}}
-  </head>
+  {{> head }}
   <body class="dark:text-white p-8">
      {{> nav }}
      {{> page }}
+     {{> footer }}
   </body>
-  <footer>
-  </footer>
 </html>
