@@ -1,6 +1,6 @@
 ## Cydonia
 
-[![zink][version-badge]][version-link]
+[![cydonia][version-badge]][version-link]
 [![ci][ci-badge]][ci-link]
 
 The static site generator.
