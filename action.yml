@@ -1,18 +1,37 @@
 name: "Install cydonia"
 description: "Install cydonia, the static site generator."
 
+inputs:
+  version:
+    description: "The version of cydonia to install"
+    required: true
+    default: "0.0.3"
+
 runs:
   using: composite
   steps:
-    - uses: dtolnay/rust-toolchain@stable
     - uses: actions/cache@v3
       with:
         path: ~/.cargo/bin/cydonia
         key: ${{ runner.os }}-cydonia
-    - name: Install cydonia
+
+    - name: Find cydonia
+      id: cache
       shell: bash
       run: |
         BIN=~/.cargo/bin/cydonia
-        if [ ! -f BIN ]; then
-          cargo install cydonia
+        VERSION=$(BIN --version)
+        if [ "$VERSION" = "cydonia ${{ inputs.version }}" ]; then
+          echo "cydonia found in cache."
+          echo "skip=true" >> "$GITHUB_OUTPUT"
         fi
+
+    - name: Install rust-toolchain
+      id: install-rust
+      if: ${{ steps.cache.outputs.skip == "" }}
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install cydonia
+      if: ${{ steps.cache.outputs.skip == "" }}
+      shell: bash
+      run: cargo install cydonia --version ${{ inputs.version }}
