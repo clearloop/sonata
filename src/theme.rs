@@ -8,16 +8,27 @@ use std::path::Path;
 pub const HIGHLIGHT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.js"));
 /// The pre-compiled highlight.css.
 pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
+/// The default theme.
+pub const DEFAULT_THEME: &str = include_str!(concat!(env!("OUT_DIR"), "/theme.css"));
 
 /// The theme for the site.
 ///
 /// TODO: not loading theme to memory.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Theme {
     /// Styles for the index page.
     pub index: String,
     /// Styles for the post page.
     pub post: String,
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self {
+            index: DEFAULT_THEME.into(),
+            post: DEFAULT_THEME.into(),
+        }
+    }
 }
 
 impl Theme {
@@ -36,7 +47,10 @@ impl Theme {
                 post: theme,
             })
         } else {
-            let theme = path.join("theme.css").read().unwrap_or_default();
+            let theme = path
+                .join("theme.css")
+                .read()
+                .unwrap_or(DEFAULT_THEME.into());
             Ok(Self {
                 index: [
                     theme.clone(),

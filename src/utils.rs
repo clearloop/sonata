@@ -2,6 +2,7 @@
 
 use anyhow::Result;
 use colored::Colorize;
+use pulldown_cmark::{html, Options, Parser};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -29,7 +30,7 @@ where
 
     fn read(&self) -> Result<String> {
         let path = self.as_ref();
-        std::fs::read_to_string(path).map_err(|e| {
+        fs::read_to_string(path).map_err(|e| {
             anyhow::anyhow!(
                 "Failed to read file: {}, {}",
                 path.display().to_string().underline(),
@@ -65,4 +66,11 @@ impl Prefix for PathBuf {
             *self = prefix.as_ref().join(&self)
         }
     }
+}
+
+/// Parse markdown to html.
+pub fn markdown(content: &str) -> String {
+    let mut html = String::new();
+    html::push_html(&mut html, Parser::new_ext(content, Options::all()));
+    html
 }

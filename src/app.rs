@@ -46,7 +46,7 @@ impl<'app> TryFrom<Manifest> for App<'app> {
         let mut handlebars = Handlebars::new();
         handlebars.set_prevent_indent(true);
         handlebars.set_strict_mode(true);
-        handlebars.register_embed_templates::<Templates>()?;
+        handlebars.register_embed_templates_with_extension::<Templates>(".hbs")?;
 
         Ok(Self {
             handlebars,

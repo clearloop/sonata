@@ -1,15 +1,26 @@
 //! post layout.
 
-use crate::utils::Read;
+use crate::utils::{self, Read};
 use anyhow::{anyhow, Result};
 use chrono::NaiveDate;
 use colored::Colorize;
-use pulldown_cmark::{html, Options, Parser};
 use serde::{Deserialize, Serialize};
 use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
+
+/// The template of the post.
+pub const TEMPLATE_POST: &str = r#"
+---
+author: "cydonia"
+date: "2024-01-01"
+description: "This is my first post with cydonia !"
+labels: ["cydonia", "rust"]
+title: "Hello World!"
+---
+This is my first post with cydonia !
+"#;
 
 /// Post layout with is markdown with yaml metadata.
 ///
@@ -86,23 +97,17 @@ impl FromStr for Post {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self> {
+        let mut this = Self::default();
+        let mut content = s.to_string();
+
         let markdown = s.splitn(3, "---").collect::<Vec<_>>();
-        if markdown.len() != 3 {
-            return Err(anyhow::anyhow!(
-                "yaml meta not found, see {} for the template.",
-                "https://github.com/clearloop/cydonia"
-            ));
+        if markdown.len() == 3 {
+            this.meta = markdown[1].parse::<Meta>()?;
+            content = markdown[2].to_string();
         }
 
-        let meta = markdown[1].parse::<Meta>()?;
-        let mut content = String::new();
-        html::push_html(&mut content, Parser::new_ext(markdown[2], Options::all()));
-
-        Ok(Self {
-            meta,
-            content,
-            ..Default::default()
-        })
+        this.content = utils::markdown(&content);
+        Ok(this)
     }
 }
 
@@ -132,6 +137,7 @@ impl FromStr for Meta {
     }
 }
 
+/// The index of the post.
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Index {
     /// If this post is the last post of the year.
@@ -142,4 +148,9 @@ pub struct Index {
 
     /// The link of the post.
     pub link: String,
+}
+
+#[test]
+fn template() {
+    assert!(Post::from_str(TEMPLATE_POST).is_ok());
 }
