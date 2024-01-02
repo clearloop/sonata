@@ -1,5 +1,7 @@
 name: "Install cydonia"
 description: "Install cydonia, the static site generator."
+icon: book-open
+color: orange
 
 inputs:
   version:
