@@ -30,7 +30,7 @@ impl Build {
             self.dir.clone()
         };
 
-        let mut manifest = Manifest::load(&proj)?;
+        let mut manifest = Manifest::load(proj)?;
         manifest.merge(self.manifest.clone());
         App::<'_>::try_from(manifest)?.render()
     }
