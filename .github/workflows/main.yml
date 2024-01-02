@@ -18,9 +18,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - uses: foundry-rs/foundry-toolchain@v1
 
       - name: Run Tests
         run: cargo nextest run --no-fail-fast --release
