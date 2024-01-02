@@ -24,9 +24,11 @@ pub enum Command {
 
 /// Cydonia command line interface
 #[derive(Debug, Parser)]
+#[clap(author, version)]
 pub struct Cydonia {
     /// The verbosity level.
     #[clap(short, long, action = clap::ArgAction::Count)]
+    #[arg(global = true)]
     pub verbose: u8,
 
     /// The sub command.

@@ -11,6 +11,21 @@ use std::{
     str::FromStr,
 };
 
+/// The template of the post.
+pub const TEMPLATE_POST: &str = r#"
+---
+author: "cydonia"
+date: "2024-01-01"
+description: "This is my first post with cydonia !"
+labels: ["cydonia", "rust"]
+title: "Hello World!"
+---
+
+# Hello World
+
+This is my first post with cydonia !
+"#;
+
 /// Post layout with is markdown with yaml metadata.
 ///
 /// TODO: load posts from any directory.
@@ -132,6 +147,7 @@ impl FromStr for Meta {
     }
 }
 
+/// The index of the post.
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Index {
     /// If this post is the last post of the year.
@@ -142,4 +158,9 @@ pub struct Index {
 
     /// The link of the post.
     pub link: String,
+}
+
+#[test]
+fn template() {
+    assert!(Post::from_str(TEMPLATE_POST).is_ok());
 }

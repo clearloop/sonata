@@ -4,7 +4,7 @@
 //!
 //! For the minimal directory layout:
 //!
-//! ```
+//! ```ignore
 //! .
 //! ├── cydonia.toml
 //! └── posts
@@ -47,12 +47,18 @@ mod utils;
 
 pub use self::{
     app::{App, LIVERELOAD_ENDPOINT},
-    manifest::Manifest,
-    post::{Meta, Post},
+    manifest::{Manifest, MINIMAL_MANIFEST},
+    post::{Meta, Post, TEMPLATE_POST},
     theme::Theme,
 };
 
 /// The default cydonia templates.
 #[derive(rust_embed::RustEmbed)]
 #[folder = "blog/templates"]
+#[include = "*.hbs"]
 pub struct Templates;
+
+#[test]
+fn embed() {
+    assert!(Templates::get("post.hbs").is_some());
+}

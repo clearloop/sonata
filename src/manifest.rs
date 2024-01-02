@@ -15,6 +15,13 @@ use std::{
 #[cfg(feature = "cli")]
 use ccli::{clap, clap::Parser};
 
+/// The minimal implementation of the manifest.
+pub const MINIMAL_MANIFEST: &str = r#"
+out = "out"
+posts = "posts"
+title = "Cydonia"
+"#;
+
 /// Manifest of the site.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "cli", derive(Parser))]
@@ -29,7 +36,7 @@ pub struct Manifest {
     pub favicon: PathBuf,
 
     /// The output directory.
-    #[serde(default = "default::out")]
+    #[serde(default = "Default::default")]
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "out"))]
     pub out: PathBuf,
 
@@ -54,6 +61,20 @@ pub struct Manifest {
     #[serde(default = "default::theme")]
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "theme"))]
     pub theme: PathBuf,
+}
+
+impl Default for Manifest {
+    fn default() -> Self {
+        Self {
+            title: "Cydonia".to_string(),
+            favicon: default::favicon(),
+            out: default::out(),
+            posts: default::posts(),
+            public: default::public(),
+            templates: default::templates(),
+            theme: default::theme(),
+        }
+    }
 }
 
 impl Manifest {
@@ -162,35 +183,40 @@ impl Manifest {
 }
 
 mod default {
-    use std::{fs, path::PathBuf};
+    use std::path::PathBuf;
 
     /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
-        fs::canonicalize(PathBuf::from("favicon.svg")).unwrap_or_default()
+        PathBuf::from("favicon.svg")
     }
 
     /// Default implementation of the out directory.
     pub fn out() -> PathBuf {
-        fs::canonicalize(PathBuf::from("out")).unwrap_or_default()
+        PathBuf::from("out")
     }
 
     /// Default implementation of the posts.
     pub fn posts() -> PathBuf {
-        fs::canonicalize(PathBuf::from("posts")).unwrap_or_default()
+        PathBuf::from("posts")
     }
 
     /// Default implementation of the posts.
     pub fn public() -> PathBuf {
-        fs::canonicalize(PathBuf::from("public")).unwrap_or_default()
+        PathBuf::from("public")
     }
 
     /// Default implementation of the templates.
     pub fn templates() -> PathBuf {
-        fs::canonicalize(PathBuf::from("templates")).unwrap_or_default()
+        PathBuf::from("templates")
     }
 
     /// Default implementation of the templates.
     pub fn theme() -> PathBuf {
-        fs::canonicalize(PathBuf::from("theme.css")).unwrap_or_default()
+        PathBuf::from("theme")
     }
+}
+
+#[test]
+fn minimal() {
+    assert!(toml::from_str::<Manifest>(MINIMAL_MANIFEST).is_ok())
 }

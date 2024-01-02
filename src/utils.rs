@@ -29,7 +29,7 @@ where
 
     fn read(&self) -> Result<String> {
         let path = self.as_ref();
-        std::fs::read_to_string(path).map_err(|e| {
+        fs::read_to_string(path).map_err(|e| {
             anyhow::anyhow!(
                 "Failed to read file: {}, {}",
                 path.display().to_string().underline(),
