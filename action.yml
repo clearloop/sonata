@@ -20,18 +20,20 @@ runs:
       shell: bash
       run: |
         BIN=~/.cargo/bin/cydonia
-        VERSION=$(BIN --version)
-        if [ "$VERSION" = "cydonia ${{ inputs.version }}" ]; then
+        VERSION=$($BIN --version)
+        if [ $? -eq 1 ]; then
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+        elif [ "$VERSION" -eq "cydonia ${{ inputs.version }}" ]; then
           echo "cydonia found in cache."
           echo "skip=true" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Install rust-toolchain
       id: install-rust
-      if: ${{ steps.cache.outputs.skip == '' }}
+      if: ${{ steps.cache.outputs.skip == 'false' }}
       uses: dtolnay/rust-toolchain@stable
 
     - name: Install cydonia
-      if: ${{ steps.cache.outputs.skip == '' }}
+      if: ${{ steps.cache.outputs.skip == 'false' }}
       shell: bash
       run: cargo install cydonia --version ${{ inputs.version }}
