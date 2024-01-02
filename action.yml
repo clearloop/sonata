@@ -13,7 +13,8 @@ runs:
     - uses: actions/cache@v3
       with:
         path: ~/.cargo/bin/cydonia
-        key: ${{ runner.os }}-cydonia
+        key: cydonia-${{ inputs.version }}-${{ runner.os }}
+        restore-keys: cydonia-
 
     - name: Find cydonia
       id: cache
@@ -23,9 +24,6 @@ runs:
         VERSION=$($BIN --version)
         if [ $? -eq 1 ]; then
           echo "skip=false" >> "$GITHUB_OUTPUT"
-        elif [ "$VERSION" -eq "cydonia ${{ inputs.version }}" ]; then
-          echo "cydonia found in cache."
-          echo "skip=true" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Install rust-toolchain
