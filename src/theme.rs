@@ -9,7 +9,7 @@ pub const HIGHLIGHT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight
 /// The pre-compiled highlight.css.
 pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
 /// The default theme.
-pub const DEFAULT_THEME: &str = include_str!("../blog/theme/theme.css");
+pub const DEFAULT_THEME: &str = include_str!(concat!(env!("OUT_DIR"), "/theme.css"));
 
 /// The theme for the site.
 ///
