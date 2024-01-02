@@ -28,10 +28,10 @@ runs:
 
     - name: Install rust-toolchain
       id: install-rust
-      if: ${{ steps.cache.outputs.skip == "" }}
+      if: ${{ steps.cache.outputs.skip == '' }}
       uses: dtolnay/rust-toolchain@stable
 
     - name: Install cydonia
-      if: ${{ steps.cache.outputs.skip == "" }}
+      if: ${{ steps.cache.outputs.skip == '' }}
       shell: bash
       run: cargo install cydonia --version ${{ inputs.version }}

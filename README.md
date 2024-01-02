@@ -3,8 +3,6 @@
 [![cydonia][version-badge]][version-link]
 [![ci][ci-badge]][ci-link]
 
-The static site generator.
-
 For the minimal directory layout:
 
 ```
@@ -39,10 +37,6 @@ theme = "theme.css"
 
 ## Github Action
 
-> [!WARNING]
->
-> This action currently not woring, plz wait for `0.0.3`
-
 ```yaml
 name: CI
 on:
@@ -57,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: clearloop/cydonia@0
+      - uses: clearloop/cydonia@0.0.3
       - run: cydonia build blog
 ```
 
