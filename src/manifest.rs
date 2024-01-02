@@ -1,7 +1,7 @@
 //! Manifest of the site.
 
 use crate::{
-    utils::{Prefix, Read},
+    utils::{self, Prefix, Read},
     Post, Theme,
 };
 use anyhow::Result;
@@ -27,7 +27,7 @@ title = "Cydonia"
 #[cfg_attr(feature = "cli", derive(Parser))]
 pub struct Manifest {
     /// The name of the site.
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "Cydonia"))]
+    #[cfg_attr(feature = "cli", clap(long, default_value = "Cydonia"))]
     pub title: String,
 
     /// The path to the favicon.
@@ -36,13 +36,13 @@ pub struct Manifest {
     pub favicon: PathBuf,
 
     /// The output directory.
-    #[serde(default = "Default::default")]
+    #[serde(default = "default::out")]
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "out"))]
     pub out: PathBuf,
 
     /// The path of the posts.
     #[serde(default = "default::posts")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "posts"))]
+    #[cfg_attr(feature = "cli", clap(long, default_value = "posts"))]
     pub posts: PathBuf,
 
     /// The path of the public directory.
@@ -59,7 +59,7 @@ pub struct Manifest {
     ///
     /// Could be a file or a directory.
     #[serde(default = "default::theme")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "theme"))]
+    #[cfg_attr(feature = "cli", clap(long, default_value = "theme"))]
     pub theme: PathBuf,
 }
 
@@ -79,12 +79,15 @@ impl Default for Manifest {
 
 impl Manifest {
     /// Load manifest from the provided path.
-    pub fn load(root: impl AsRef<Path>) -> Result<Self> {
-        let path = root.as_ref().join("cydonia.toml");
-        let manifest: Self = toml::from_str(&root.as_ref().join("cydonia.toml").read()?)
-            .map_err(|e| anyhow::anyhow!("Failed to parse {}: {}", path.display(), e))?;
+    pub fn load(root: &Path) -> Result<Self> {
+        let path = utils::find_proj(root)?;
+        let toml = path.join("cydonia.toml");
 
-        Ok(manifest.abs(root))
+        tracing::info!("loading manifest from {toml:?}");
+        let manifest: Self = toml::from_str(&toml.read()?)
+            .map_err(|e| anyhow::anyhow!("Failed to parse {toml:?}: {e}"))?;
+
+        Ok(manifest.abs(path))
     }
 
     /// Copy the public directory.

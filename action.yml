@@ -5,7 +5,7 @@ inputs:
   version:
     description: "The version of cydonia to install"
     required: true
-    default: "0.0.4"
+    default: "0.0.5"
 
 runs:
   using: composite
@@ -14,7 +14,7 @@ runs:
       with:
         path: ~/.cargo/bin/cydonia
         key: cydonia-${{ inputs.version }}-${{ runner.os }}
-        restore-keys: cydonia-
+        restore-keys: cydonia-${{ inputs.version }}
 
     - name: Find cydonia
       id: cache

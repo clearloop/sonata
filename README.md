@@ -3,62 +3,31 @@
 [![cydonia][version-badge]][version-link]
 [![ci][ci-badge]][ci-link]
 
+```bash
+cargo install cydonia
+cydonia init blog
+cydonia serve blog
+```
+
 For the minimal directory layout:
 
 ```
-.
+my-blog
 ├── cydonia.toml
 └── posts
     └── 2024-01-01-hello-world.md
 ```
 
-The full configuration:
-
-```toml
-# my-blog/cydonia.toml
-title = "Cydonia"         # The title of the site.
-
-# Default values of the optional fields.
-# --------------------------------------
-favicon = "favicon.svg"   # The path to the favicon.
-out = "out"               # The path to the output directory.
-posts = "posts"           # The path to the posts.
-public = "public"         # The path to the public directory.
-templates = "templates"   # The path to the templates.
-
-# Theme could also be a folder:
-#
-# - [theme]
-#   - index.css (optional)
-#   - post.css  (optional)
-#   - theme.css (optional)
-theme = "theme.css"
-```
-
-## Github Action
-
-```yaml
-name: CI
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: clearloop/cydonia@0.0.3
-      - run: cydonia build blog
-```
+see [blog/cydonia.toml][cydonia-toml] for the full configuration of
+`cydonia.toml`, [.github/workflows/action.yml][action-yml] for the
+example of configuring `cydonia` in your github actions.
 
 ## LICENSE
 
 GPL-3.0-only
 
+[action-yml]: .github/workflows/action.yml
+[cydonia-toml]: blog/cydonia.toml
 [version-badge]: https://img.shields.io/crates/v/cydonia
 [version-link]: https://docs.rs/cydonia
 [ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml
