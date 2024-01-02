@@ -19,8 +19,8 @@ my-blog
 ```
 
 see [blog/cydonia.toml][cydonia-toml] for the full configuration of
-`cydonia.toml`, [.github/workflows/action.yml][action-yml] for the
-example of configuring `cydonia` in your github actions.
+`cydonia.toml`, [.github/workflows/action.yml][action-yml] for configuring
+github actions .
 
 ## LICENSE
 
