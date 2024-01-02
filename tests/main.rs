@@ -5,7 +5,7 @@ use cydonia::{App, Manifest, Post};
 use std::path::PathBuf;
 
 fn manifest() -> Result<Manifest> {
-    Manifest::load(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("blog"))
+    Manifest::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("blog"))
 }
 
 #[test]
