@@ -21,8 +21,7 @@ runs:
       shell: bash
       run: |
         BIN=~/.cargo/bin/cydonia
-        VERSION=$($BIN --version)
-        if [ $? -eq 1 ]; then
+        if [ ! -f $BIN ]; then
           echo "skip=false" >> "$GITHUB_OUTPUT"
         fi
 
