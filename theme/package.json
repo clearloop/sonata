@@ -1,4 +1,5 @@
 {
+  "license": "MIT",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
     "css-loader": "^6.8.1",
@@ -9,8 +10,8 @@
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --minify",
-    "watch:default": "tailwindcss -i ./theme/default.css -o ./blog/theme/theme.css --watch",
+    "default": "tailwindcss -i ./src/default.css -o ../blog/theme/theme.css --minify",
+    "watch:default": "tailwindcss -i ./src/default.css -o ../blog/theme/theme.css --watch",
     "build": "yarn && yarn default && webpack build"
   }
 }

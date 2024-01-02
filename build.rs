@@ -18,7 +18,11 @@ fn main() -> Result<()> {
     }
 
     // Build default theme
-    if !Command::new(yarn?).arg("build").status()?.success() {
+    if !Command::new(yarn?)
+        .args(["--cwd", "theme", "build"])
+        .status()?
+        .success()
+    {
         return Err(anyhow!("build default theme failed."));
     }
 

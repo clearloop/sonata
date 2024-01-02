@@ -87,8 +87,8 @@ impl<'app> App<'app> {
     }
 
     /// Create a new app.
-    pub fn load(root: impl AsRef<Path>) -> Result<Self> {
-        tracing::info!("loading app from {} ...", root.as_ref().display());
+    pub fn load(root: &PathBuf) -> Result<Self> {
+        tracing::info!("loading app from {root:?} ...");
         Manifest::load(root)?.try_into()
     }
 

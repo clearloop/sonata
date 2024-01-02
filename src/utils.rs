@@ -1,6 +1,6 @@
 //! cydonia utils.
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use colored::Colorize;
 use pulldown_cmark::{html, Options, Parser};
 use std::{
@@ -73,4 +73,16 @@ pub fn markdown(content: &str) -> String {
     let mut html = String::new();
     html::push_html(&mut html, Parser::new_ext(content, Options::all()));
     html
+}
+
+/// Find the directory includes `cydonia.toml`.
+pub fn find_proj(base: &Path) -> Result<PathBuf> {
+    if base.join("cydonia.toml").exists() {
+        return Ok(base.to_path_buf());
+    }
+
+    Ok(etc::find_up("cydonia.toml")?
+        .parent()
+        .ok_or_else(|| anyhow!("Could not find cydonia.toml"))?
+        .to_path_buf())
 }

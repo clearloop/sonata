@@ -27,7 +27,7 @@ pub struct Watch {
 }
 
 impl Watch {
-    /// Make the output directory absolute.
+    /// Get the manifest.
     pub fn manifest(&self) -> Result<Manifest> {
         let mut manifest = Manifest::load(&self.dir)?;
         if self.out.is_absolute() || self.out != PathBuf::from("out") {

@@ -3,10 +3,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   mode: "production",
   entry: {
-    "highlight": "./theme/highlight.js"
+    "highlight": "./src/highlight.js"
   },
   output: {
-    path: __dirname + "/blog/theme",
+    path: __dirname + "/../blog/theme",
     filename: "[name].js",
   },
   module: {
