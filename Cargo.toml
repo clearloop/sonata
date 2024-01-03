@@ -3,21 +3,21 @@ name = "cydonia"
 authors = [ "clearloop" ]
 description = "The static site generator."
 documentation = "https://docs.rs/cydonia"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 license = "GPL-3.0-only"
 
 [dependencies]
-anyhow = "1.0.77"
+anyhow = "1.0.79"
 chrono = { version = "0.4.31", features = [ "serde" ] }
 colored = "2.1.0"
 etc = "0.1.18"
 handlebars = { version = "5.0.0", features = [ "dir_source", "rust-embed" ] }
 pulldown-cmark = { version = "0.9.3", default-features = false }
 rust-embed = "8.2.0"
-serde = { version = "1.0.193", features = [ "derive" ] }
-serde_json = "1.0.108"
-serde_yaml = "0.9.29"
+serde = { version = "1.0.194", features = [ "derive" ] }
+serde_json = "1.0.110"
+serde_yaml = "0.9.30"
 toml = "0.8.8"
 tracing = "0.1.40"
 
@@ -30,7 +30,7 @@ futures = { version = "0.3.30", optional = true }
 async-lock = { version = "3.2.0", optional = true }
 
 [build-dependencies]
-anyhow = "1.0.77"
+anyhow = "1.0.79"
 which = "5.0.0"
 
 [features]
