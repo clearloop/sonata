@@ -11,7 +11,7 @@ cydonia init blog
 cydonia serve blog
 ```
 
-The minimal directory layout is like below, see [cydonia.toml][cydonia-toml]
+The minimal directory layout is like below, see [cydonia.toml](./blog/cydonia.toml)
 for the full configuration.
 
 ```
@@ -54,7 +54,6 @@ jobs:
 
 GPL-3.0-only
 
-[cydonia-toml]: blog/cydonia.toml
 [version-badge]: https://img.shields.io/crates/v/cydonia
 [version-link]: https://docs.rs/cydonia
 [ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml

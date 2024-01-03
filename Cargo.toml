@@ -1,10 +1,12 @@
 [package]
 name = "cydonia"
+version = "0.0.7"
+edition = "2021"
 authors = [ "clearloop" ]
 description = "The static site generator."
 documentation = "https://docs.rs/cydonia"
-version = "0.0.7"
-edition = "2021"
+homepage = "https://github.com/clearloop/cydonia"
+repository = "https://github.com/clearloop/cydonia.git"
 license = "GPL-3.0-only"
 
 [dependencies]
