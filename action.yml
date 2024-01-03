@@ -4,6 +4,12 @@ branding:
   icon: book-open
   color: orange
 
+inputs:
+  version:
+    required: true
+    description: The version of cydonia to install
+    default: "0.0.6"
+
 runs:
   using: composite
   steps:
@@ -18,7 +24,12 @@ runs:
       shell: bash
       run: |
         BIN=~/.cargo/bin/cydonia
-        if [ ! -f $BIN ]; then
+        if [ -f $BIN ]; then
+          VERSION=$($BIN --version)
+          if [ "$VERSION" -nq ${{ inputs.version }} ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+        else
           echo "skip=false" >> "$GITHUB_OUTPUT"
         fi
 
@@ -30,4 +41,4 @@ runs:
     - name: Install cydonia
       if: ${{ steps.cache.outputs.skip == 'false' }}
       shell: bash
-      run: cargo install cydonia --version 0.0.6
+      run: cargo install cydonia --version ${{ inputs.version }}
