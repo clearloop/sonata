@@ -1,0 +1,33 @@
+name: Cydonia
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Cydonia
+        uses: clearloop/cydonia@v0.0.5
+
+      - name: Build the site
+        run: cydonia build blog
+
+      - name: Assemble docs
+        run: mv target/doc docs/book/rustdocs
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./blog/out
