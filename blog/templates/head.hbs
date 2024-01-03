@@ -8,27 +8,23 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="{{tab}}">
     <meta name="twitter:image" content="https://github.com/clearloop/cydonia/releases/download/v0.0.2-pre/cydonia.svg">
+    <meta name="twitter:description" content="{{ description }}">
     <!-- <meta name="twitter:site" content="@cydonia"> -->
     <!-- <meta name="twitter:creator" content="@cydonia"> -->
-    <!-- <meta name="twitter:description" content="{{ tab }}"> -->
+
+    <!-- theme  -->
+    <link rel="stylesheet" href="{{ base }}/theme.css">
 
     <!-- favicon -->
     {{#if favicon}}
         <link rel="shortcut icon" href="{{ favicon }}">
     {{/if}}
 
-    <!-- styles for index -->
-    {{#if posts}}
-        <link rel="stylesheet" href="/index.css">
-    {{/if}}
-
     <!-- styles for post -->
     {{#if post}}
-        <link rel="stylesheet" href="/highlight.css">
-        <link rel="stylesheet" href="/post.css">
-        <script src="/highlight.js" defer></script>
+        <link rel="stylesheet" href="{{ base }}/highlight.css">
+        <script src="{{ base  }}/highlight.js" defer></script>
     {{/if}}
-
 
     <!-- livereload -->
     {{#if livereload}}

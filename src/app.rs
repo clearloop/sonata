@@ -62,6 +62,11 @@ impl<'app> App<'app> {
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
         map.insert("title".into(), self.manifest.title.clone().into());
+        map.insert("base".into(), self.manifest.base.clone().into());
+        map.insert(
+            "description".into(),
+            self.manifest.description.clone().into(),
+        );
 
         if self.livereload {
             map.insert("livereload".into(), LIVERELOAD_ENDPOINT.into());
@@ -181,17 +186,7 @@ impl<'app> App<'app> {
 
     /// Write theme to the output directory.
     pub fn render_theme(&self) -> Result<()> {
-        self.manifest.theme()?.write(&self.manifest.out)?;
-
-        // Override highlight.{css, js} if exist
-        for hl in ["highlight.js", "highlight.css"] {
-            let path = self.manifest.theme.join(hl);
-            if path.exists() {
-                fs::copy(path, self.manifest.out.join(hl))?;
-            }
-        }
-
-        Ok(())
+        self.manifest.write_theme(&self.manifest.out)
     }
 
     /// Render a template.
