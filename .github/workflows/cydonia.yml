@@ -26,9 +26,6 @@ jobs:
       - name: Build the site
         run: cydonia build blog
 
-      - name: Assemble docs
-        run: mv target/doc docs/book/rustdocs
-
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
