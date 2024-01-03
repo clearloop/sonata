@@ -3,7 +3,7 @@ title = "Cydonia"            # The title of the site.
 
 # Default values of the optional fields.
 # --------------------------------------
-base = "/cydonia"
+base = ""
 favicon = "favicon.svg"      # The path to the favicon.
 out = "out"                  # The path to the output directory.
 posts = "posts"              # The path to the posts.
