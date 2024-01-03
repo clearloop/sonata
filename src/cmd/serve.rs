@@ -74,9 +74,14 @@ impl Serve {
         let cydonia = if manifest.base.is_empty() {
             warp::fs::dir(manifest.out.clone()).boxed()
         } else {
-            warp::path(manifest.base.clone())
-                .and(warp::fs::dir(manifest.out.clone()))
-                .boxed()
+            let mut base = warp::any().boxed();
+            for part in manifest.base.split('/').collect::<Vec<&str>>() {
+                if !part.is_empty() {
+                    base = base.and(warp::path(part.to_string()).boxed()).boxed();
+                }
+            }
+
+            base.and(warp::fs::dir(manifest.out.clone())).boxed()
         }
         .or(livereload);
 
