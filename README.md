@@ -1,7 +1,9 @@
-## Cydonia
+# Cydonia
 
 [![cydonia][version-badge]][version-link]
 [![ci][ci-badge]][ci-link]
+
+## Usage
 
 ```bash
 cargo install cydonia
@@ -27,8 +29,6 @@ name: Cydonia
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   deploy:
@@ -36,13 +36,9 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Cydonia
-        uses: clearloop/cydonia@0.0.6
+      - uses: clearloop/cydonia@0.0.7
 
       - name: Build the site
         run: cydonia build blog
