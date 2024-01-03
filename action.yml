@@ -4,12 +4,6 @@ branding:
   icon: book-open
   color: orange
 
-inputs:
-  version:
-    description: "The version of cydonia to install"
-    required: true
-    default: "0.0.6"
-
 runs:
   using: composite
   steps:
@@ -36,4 +30,4 @@ runs:
     - name: Install cydonia
       if: ${{ steps.cache.outputs.skip == 'false' }}
       shell: bash
-      run: cargo install cydonia --version ${{ inputs.version }}
+      run: cargo install cydonia --version 0.0.6
