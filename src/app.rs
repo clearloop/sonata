@@ -62,6 +62,7 @@ impl<'app> App<'app> {
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
         map.insert("title".into(), self.manifest.title.clone().into());
+        map.insert("base".into(), self.manifest.base.clone().into());
         map.insert(
             "description".into(),
             self.manifest.description.clone().into(),
