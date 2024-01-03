@@ -9,7 +9,8 @@ cydonia init blog
 cydonia serve blog
 ```
 
-For the minimal directory layout:
+The minimal directory layout is like below, see [cydonia.toml][cydonia-toml]
+for the full configuration.
 
 ```
 my-blog
@@ -18,19 +19,46 @@ my-blog
     └── 2024-01-01-hello-world.md
 ```
 
-## Examples
+## Github Action
 
-| Example                                      | Description            |
-| -------------------------------------------- | ---------------------- |
-| [cydonia.toml][cydonia-toml]                 | The full configuration |
-| [.github/workflows/cydonia.yml][cydonia-yml] | Github pages action    |
+```yaml
+name: Cydonia
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Cydonia
+        uses: clearloop/cydonia@0.0.6
+
+      - name: Build the site
+        run: cydonia build blog
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./blog/out
+```
 
 ## LICENSE
 
 GPL-3.0-only
 
 [cydonia-toml]: blog/cydonia.toml
-[cydonia-yml]: .github/workflows/cydonia.yml
 [version-badge]: https://img.shields.io/crates/v/cydonia
 [version-link]: https://docs.rs/cydonia
 [ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml
