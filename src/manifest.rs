@@ -2,7 +2,7 @@
 
 use crate::{
     utils::{self, Prefix, Read},
-    Post, Theme,
+    Post,
 };
 use anyhow::Result;
 use chrono::Datelike;
@@ -29,6 +29,16 @@ pub struct Manifest {
     /// The name of the site.
     #[cfg_attr(feature = "cli", clap(long, default_value = "Cydonia"))]
     pub title: String,
+
+    /// The base URL of the site.
+    #[serde(default = "Default::default")]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
+    pub base: String,
+
+    /// The description of the site.
+    #[serde(default = "Default::default")]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
+    pub description: String,
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]
@@ -63,20 +73,6 @@ pub struct Manifest {
     pub theme: PathBuf,
 }
 
-impl Default for Manifest {
-    fn default() -> Self {
-        Self {
-            title: "Cydonia".to_string(),
-            favicon: default::favicon(),
-            out: default::out(),
-            posts: default::posts(),
-            public: default::public(),
-            templates: default::templates(),
-            theme: default::theme(),
-        }
-    }
-}
-
 impl Manifest {
     /// Load manifest from the provided path.
     pub fn load(root: &Path) -> Result<Self> {
@@ -101,6 +97,55 @@ impl Manifest {
             );
 
             etc::cp_r(&self.public, &public)?;
+        }
+
+        Ok(())
+    }
+
+    /// Get the posts.
+    pub fn posts(&self) -> Result<Vec<Post>> {
+        let mut posts = fs::read_dir(&self.posts)?
+            .map(|e| Post::load(e?.path()))
+            .collect::<Result<Vec<_>>>()?;
+
+        if posts.is_empty() {
+            return Ok(posts);
+        }
+
+        posts.sort_by(|a, b| b.meta.date.cmp(&a.meta.date));
+
+        let mut current_year = posts[0].meta.date.year() + 1;
+        posts.iter_mut().for_each(|post| {
+            let year = post.meta.date.year();
+            if year < current_year {
+                post.index.year = post.meta.date.format("%Y").to_string();
+                current_year = year;
+            }
+        });
+
+        Ok(posts)
+    }
+
+    /// Write styles to the given path.
+    pub fn write_theme(&self, out: &Path) -> Result<()> {
+        let base = self
+            .theme
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("Could not find the parent path of {:?}", self.theme))?;
+
+        for (maybe, default) in [
+            ("theme.css", default::DEFAULT_THEME),
+            ("highlight.css", default::HIGHLIGHT_CSS),
+            ("highlight.js", default::HIGHLIGHT_JS),
+        ] {
+            let path = base.join(maybe);
+            let hl = if path.exists() {
+                path.read()?
+            } else {
+                default.to_string()
+            };
+
+            fs::write(out.join(maybe), hl)?;
         }
 
         Ok(())
@@ -144,35 +189,6 @@ impl Manifest {
         ]
     }
 
-    /// Get the posts.
-    pub fn posts(&self) -> Result<Vec<Post>> {
-        let mut posts = fs::read_dir(&self.posts)?
-            .map(|e| Post::load(e?.path()))
-            .collect::<Result<Vec<_>>>()?;
-
-        if posts.is_empty() {
-            return Ok(posts);
-        }
-
-        posts.sort_by(|a, b| b.meta.date.cmp(&a.meta.date));
-
-        let mut current_year = posts[0].meta.date.year() + 1;
-        posts.iter_mut().for_each(|post| {
-            let year = post.meta.date.year();
-            if year < current_year {
-                post.index.year = post.meta.date.format("%Y").to_string();
-                current_year = year;
-            }
-        });
-
-        Ok(posts)
-    }
-
-    /// Get the theme.
-    pub fn theme(&self) -> Result<Theme> {
-        Theme::load(&self.theme)
-    }
-
     /// Make paths absolute.
     fn abs(mut self, prefix: impl AsRef<Path>) -> Self {
         self.favicon.prefix(&prefix);
@@ -185,8 +201,32 @@ impl Manifest {
     }
 }
 
+impl Default for Manifest {
+    fn default() -> Self {
+        Self {
+            title: "Cydonia".to_string(),
+            base: "".to_string(),
+            description: "".to_string(),
+            favicon: default::favicon(),
+            out: default::out(),
+            posts: default::posts(),
+            public: default::public(),
+            templates: default::templates(),
+            theme: default::theme(),
+        }
+    }
+}
+
 mod default {
+    //! The default configurations for the manifest.
     use std::path::PathBuf;
+
+    /// The pre-compiled highlight.js.
+    pub const HIGHLIGHT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.js"));
+    /// The pre-compiled highlight.css.
+    pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
+    /// The default theme.
+    pub const DEFAULT_THEME: &str = include_str!(concat!(env!("OUT_DIR"), "/theme.css"));
 
     /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {

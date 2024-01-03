@@ -42,14 +42,12 @@ mod app;
 pub mod cmd;
 mod manifest;
 mod post;
-mod theme;
 mod utils;
 
 pub use self::{
     app::{App, LIVERELOAD_ENDPOINT},
     manifest::{Manifest, MINIMAL_MANIFEST},
     post::{Meta, Post, TEMPLATE_POST},
-    theme::Theme,
 };
 
 /// The default cydonia templates.

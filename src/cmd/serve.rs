@@ -71,15 +71,27 @@ impl Serve {
 
         let manifest = self.watch.manifest()?;
         let watcher = self.watch.clone();
-        let cydonia = warp::serve(warp::fs::dir(manifest.out.clone()).or(livereload))
-            .run((self.address, port));
+        let cydonia = if manifest.base.is_empty() {
+            warp::fs::dir(manifest.out.clone()).boxed()
+        } else {
+            let mut base = warp::any().boxed();
+            for part in manifest.base.split('/').collect::<Vec<&str>>() {
+                if !part.is_empty() {
+                    base = base.and(warp::path(part.to_string()).boxed()).boxed();
+                }
+            }
 
+            base.and(warp::fs::dir(manifest.out.clone())).boxed()
+        }
+        .or(livereload);
+
+        let service = warp::serve(cydonia).run((self.address, port));
         Runtime::new()?.block_on(async {
             tracing::info!("listening on http://{}:{} ...", self.address, port);
             let watcher = tokio::task::spawn_blocking(move || watcher.watch(manifest, tx));
 
             if let Err(e) = futures::select! {
-                r = cydonia.fuse() => Ok(r),
+                r = service.fuse() => Ok(r),
                 r = watcher.fuse() => r.map_err(Into::into).and_then(|r| r),
             } {
                 tracing::error!("failed to run server: {}", e);
