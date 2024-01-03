@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Cydonia
-        uses: clearloop/cydonia@v0.0.5
+        uses: clearloop/cydonia@v0.0.6
 
       - name: Build the site
         run: cydonia build blog
