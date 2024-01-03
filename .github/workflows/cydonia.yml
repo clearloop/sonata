@@ -19,7 +19,7 @@ jobs:
       - uses: ./
       - run: cydonia build blog
       - name: Deploy
-        # if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
