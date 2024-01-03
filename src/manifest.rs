@@ -30,11 +30,6 @@ pub struct Manifest {
     #[cfg_attr(feature = "cli", clap(long, default_value = "Cydonia"))]
     pub title: String,
 
-    /// The base URL of the site.
-    #[serde(default = "Default::default")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
-    pub base: String,
-
     /// The description of the site.
     #[serde(default = "Default::default")]
     #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
@@ -205,7 +200,6 @@ impl Default for Manifest {
     fn default() -> Self {
         Self {
             title: "Cydonia".to_string(),
-            base: "".to_string(),
             description: "".to_string(),
             favicon: default::favicon(),
             out: default::out(),
