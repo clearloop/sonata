@@ -32,7 +32,7 @@ pub struct Manifest {
 
     /// The base URL of the site.
     #[serde(default = "Default::default")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "/"))]
     pub base: String,
 
     /// The description of the site.
