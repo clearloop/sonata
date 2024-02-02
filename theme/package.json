@@ -13,5 +13,8 @@
     "default": "tailwindcss -i ./src/default.css -o ../blog/theme/theme.css --minify",
     "watch:default": "tailwindcss -i ./src/default.css -o ../blog/theme/theme.css --watch",
     "build": "yarn && yarn default && webpack build"
+  },
+  "dependencies": {
+    "highlightjs-solidity": "^2.0.6"
   }
 }
