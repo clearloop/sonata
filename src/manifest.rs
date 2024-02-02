@@ -31,8 +31,8 @@ pub struct Manifest {
     pub title: String,
 
     /// The base URL of the site.
-    #[serde(default = "Default::default")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = ""))]
+    #[serde(default = "default::base")]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "/"))]
     pub base: String,
 
     /// The description of the site.
@@ -227,6 +227,11 @@ mod default {
     pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
     /// The default theme.
     pub const DEFAULT_THEME: &str = include_str!(concat!(env!("OUT_DIR"), "/theme.css"));
+
+    /// Default implementation of the base URL.
+    pub fn base() -> String {
+        "/".to_string()
+    }
 
     /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
