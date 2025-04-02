@@ -17,7 +17,7 @@ use std::{
 /// Watch command
 #[derive(Parser, Debug, Clone)]
 pub struct Watch {
-    /// The root of the cydonia site
+    /// The root of the sonata site
     #[clap(default_value = ".")]
     pub dir: PathBuf,
 

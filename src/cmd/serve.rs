@@ -71,7 +71,7 @@ impl Serve {
 
         let manifest = self.watch.manifest()?;
         let watcher = self.watch.clone();
-        let cydonia = if manifest.base.is_empty() {
+        let sonata = if manifest.base.is_empty() {
             warp::fs::dir(manifest.out.clone()).boxed()
         } else {
             let mut base = warp::any().boxed();
@@ -85,7 +85,7 @@ impl Serve {
         }
         .or(livereload);
 
-        let service = warp::serve(cydonia).run((self.address, port));
+        let service = warp::serve(sonata).run((self.address, port));
         Runtime::new()?.block_on(async {
             tracing::info!("listening on http://{}:{} ...", self.address, port);
             let watcher = tokio::task::spawn_blocking(move || watcher.watch(manifest, tx));

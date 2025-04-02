@@ -1,12 +1,12 @@
 [package]
-name = "cydonia"
-version = "0.0.8"
+name = "sonata"
+version = "0.1.1"
 edition = "2021"
 authors = [ "clearloop" ]
 description = "The static site generator."
-documentation = "https://docs.rs/cydonia"
-homepage = "https://github.com/clearloop/cydonia"
-repository = "https://github.com/clearloop/cydonia.git"
+documentation = "https://docs.rs/sonata"
+homepage = "https://github.com/clearloop/sonata"
+repository = "https://github.com/clearloop/sonata.git"
 license = "GPL-3.0-only"
 
 [dependencies]

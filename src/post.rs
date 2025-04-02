@@ -13,13 +13,13 @@ use std::{
 /// The template of the post.
 pub const TEMPLATE_POST: &str = r#"
 ---
-author: "cydonia"
+author: ""
 date: "2024-01-01"
-description: "This is my first post with cydonia !"
-labels: ["cydonia", "rust"]
+description: "This is my first post with sonata !"
+labels: ["sonata", "rust"]
 title: "Hello World!"
 ---
-This is my first post with cydonia !
+This is my first post with sonata !
 "#;
 
 /// Post layout with is markdown with yaml metadata.

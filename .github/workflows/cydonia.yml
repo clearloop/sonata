@@ -1,4 +1,4 @@
-name: Cydonia
+name: sonata
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./
-      - run: cydonia build blog
+      - run: sonata build blog
       - name: Deploy
         if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3

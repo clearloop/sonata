@@ -1,5 +1,5 @@
-name: "Install cydonia"
-description: "Install cydonia, the static site generator."
+name: "Install sonata"
+description: "Install sonata, the static site generator."
 branding:
   icon: book-open
   color: orange
@@ -7,7 +7,7 @@ branding:
 inputs:
   version:
     required: true
-    description: The version of cydonia to install
+    description: The version of sonata to install
     default: "0.0.8"
 
 runs:
@@ -15,15 +15,15 @@ runs:
   steps:
     - uses: actions/cache@v3
       with:
-        path: ~/.cargo/bin/cydonia
-        key: cydonia-${{ inputs.version }}-${{ runner.os }}
-        restore-keys: cydonia-${{ inputs.version }}
+        path: ~/.cargo/bin/sonata
+        key: sonata-${{ inputs.version }}-${{ runner.os }}
+        restore-keys: sonata-${{ inputs.version }}
 
-    - name: Find cydonia
+    - name: Find sonata
       id: cache
       shell: bash
       run: |
-        BIN=~/.cargo/bin/cydonia
+        BIN=~/.cargo/bin/sonata
         if [ -f $BIN ]; then
           VERSION=$($BIN --version)
           if [ "$VERSION" -nq ${{ inputs.version }} ]; then
@@ -38,7 +38,7 @@ runs:
       if: ${{ steps.cache.outputs.skip == 'false' }}
       uses: dtolnay/rust-toolchain@stable
 
-    - name: Install cydonia
+    - name: Install sonata
       if: ${{ steps.cache.outputs.skip == 'false' }}
       shell: bash
-      run: cargo install cydonia --version ${{ inputs.version }}
+      run: cargo install sonata --version ${{ inputs.version }}

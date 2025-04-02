@@ -4,7 +4,7 @@
 //! - blog
 //!   - posts
 //!     - 2023-12-29-foo-bar.md
-//!   - cydonia.toml
+//!   - sonata.toml
 //!   - theme [ theme.css ]
 //!     - index.css
 //!     - post.css
@@ -31,7 +31,7 @@ pub const LIVERELOAD_ENDPOINT: &str = "__livereload";
 pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
-    /// The cydonia.toml manifest.
+    /// The sonata.toml manifest.
     pub manifest: Manifest,
     /// Whether to enable livereload.
     pub livereload: bool,

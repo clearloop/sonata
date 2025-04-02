@@ -19,7 +19,7 @@ use ccli::{clap, clap::Parser};
 pub const MINIMAL_MANIFEST: &str = r#"
 out = "out"
 posts = "posts"
-title = "Cydonia"
+title = "sonata"
 "#;
 
 /// Manifest of the site.
@@ -27,7 +27,7 @@ title = "Cydonia"
 #[cfg_attr(feature = "cli", derive(Parser))]
 pub struct Manifest {
     /// The name of the site.
-    #[cfg_attr(feature = "cli", clap(long, default_value = "Cydonia"))]
+    #[cfg_attr(feature = "cli", clap(long, default_value = "sonata"))]
     pub title: String,
 
     /// The base URL of the site.
@@ -77,7 +77,7 @@ impl Manifest {
     /// Load manifest from the provided path.
     pub fn load(root: &Path) -> Result<Self> {
         let path = utils::find_proj(root)?;
-        let toml = path.join("cydonia.toml");
+        let toml = path.join("sonata.toml");
 
         tracing::info!("loading manifest from {toml:?}");
         let manifest: Self = toml::from_str(&toml.read()?)
@@ -204,7 +204,7 @@ impl Manifest {
 impl Default for Manifest {
     fn default() -> Self {
         Self {
-            title: "Cydonia".to_string(),
+            title: "sonata".to_string(),
             base: "".to_string(),
             description: "".to_string(),
             favicon: default::favicon(),

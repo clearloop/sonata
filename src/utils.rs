@@ -1,4 +1,4 @@
-//! cydonia utils.
+//! sonata utils.
 
 use anyhow::{anyhow, Result};
 use colored::Colorize;
@@ -75,14 +75,14 @@ pub fn markdown(content: &str) -> String {
     html
 }
 
-/// Find the directory includes `cydonia.toml`.
+/// Find the directory includes `sonata.toml`.
 pub fn find_proj(base: &Path) -> Result<PathBuf> {
-    if base.join("cydonia.toml").exists() {
+    if base.join("sonata.toml").exists() {
         return Ok(base.to_path_buf());
     }
 
-    Ok(etc::find_up("cydonia.toml")?
+    Ok(etc::find_up("sonata.toml")?
         .parent()
-        .ok_or_else(|| anyhow!("Could not find cydonia.toml"))?
+        .ok_or_else(|| anyhow!("Could not find sonata.toml"))?
         .to_path_buf())
 }

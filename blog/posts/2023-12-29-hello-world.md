@@ -1,7 +1,7 @@
 ---
 author: cl
-description: The example post of cydonia.
-labels: [cydonia]
+description: The example post of sonata.
+labels: [sonata]
 title: Hello, World!
 ---
 

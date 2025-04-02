@@ -1,4 +1,4 @@
-//! cydonia cli
+//! sonata cli
 #![cfg(feature = "cli")]
 
 pub use self::{build::Build, init::Init, serve::Serve, watch::Watch};
@@ -9,23 +9,23 @@ mod init;
 mod serve;
 mod watch;
 
-/// Cydonia sub command.
+/// sonata sub command.
 #[derive(Debug, Parser)]
 pub enum Command {
-    /// Builds a cydonia site from its markdown files
+    /// Builds a sonata site from its markdown files
     Build(Build),
-    /// Creates the boilerplate structure and files for a cydonia site
+    /// Creates the boilerplate structure and files for a sonata site
     Init(Init),
-    /// Serves a cydonia site, and rebuilds it on changes
+    /// Serves a sonata site, and rebuilds it on changes
     Serve(Serve),
-    /// Watches a cydonia site's files and rebuilds it on changes
+    /// Watches a sonata site's files and rebuilds it on changes
     Watch(Watch),
 }
 
-/// Cydonia command line interface
+/// sonata command line interface
 #[derive(Debug, Parser)]
 #[clap(author, version)]
-pub struct Cydonia {
+pub struct Sonata {
     /// The verbosity level.
     #[clap(short, long, action = clap::ArgAction::Count)]
     #[arg(global = true)]
@@ -36,7 +36,7 @@ pub struct Cydonia {
     pub command: Command,
 }
 
-impl App for Cydonia {
+impl App for Sonata {
     fn verbose(&self) -> u8 {
         self.verbose
     }
