@@ -2,6 +2,7 @@
 /target
 .log
 .DS_Store
+res
 blog/out
 blog/theme
 blog/favicon.svg
