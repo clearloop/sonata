@@ -99,21 +99,27 @@ impl App<'_> {
     }
 
     /// Conditional render the site
-    pub fn conditional_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
+    pub fn crender(&mut self, paths: Vec<PathBuf>) -> Result<()> {
         let mut templates_changed = false;
         for path in paths {
-            if self.manifest.posts.is_sub(&path)? {
+            if self.manifest.posts.exists() && self.manifest.posts.is_sub(&path)? {
+                tracing::trace!("rendering post: {path:?} ...");
                 self.render_post(Post::load(&path)?)?;
-            } else if self.manifest.theme.is_sub(&path)? {
+            } else if self.manifest.theme.exists() && self.manifest.theme.is_sub(&path)? {
+                tracing::trace!("rendering theme: {path:?} ...");
                 self.render_theme()?;
-            } else if self.manifest.public.is_sub(&path)? {
+            } else if self.manifest.public.exists() && self.manifest.public.is_sub(&path)? {
+                tracing::trace!("copying public: {path:?} ...");
                 self.manifest.copy_public()?;
-            } else if self.manifest.favicon.is_sub(&path)? {
+            } else if self.manifest.favicon.exists() && self.manifest.favicon.is_sub(&path)? {
+                tracing::trace!("rendering favicon: {path:?} ...");
                 self.render_favicon()?;
-            } else if self.manifest.templates.is_sub(&path)? {
+            } else if self.manifest.templates.exists() && self.manifest.templates.is_sub(&path)? {
                 tracing::info!("reloading templates ...");
                 templates_changed = true;
                 self.register_templates()?;
+            } else {
+                tracing::trace!("skipping {path:?} ...");
             }
         }
 

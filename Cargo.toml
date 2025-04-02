@@ -10,7 +10,8 @@ repository = "https://github.com/clearloop/sonata.git"
 license = "GPL-3.0-only"
 include = [
     "Cargo.toml",
-    "blog",
+    "blog/theme",
+    "blog/templates",
     "src",
     "build.rs",
     "tests",
