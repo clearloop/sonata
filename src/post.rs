@@ -121,7 +121,7 @@ pub struct Meta {
     pub author: String,
     /// The profile url of the author.
     #[serde(default)]
-    pub profile_url: String,
+    pub twitter: String,
     /// The date of the post.
     #[serde(default)]
     pub date: NaiveDate,

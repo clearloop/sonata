@@ -26,6 +26,11 @@ title = "sonata"
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "cli", derive(Parser))]
 pub struct Manifest {
+    /// The site name.
+    #[serde(default = "default::site")]
+    #[cfg_attr(feature = "cli", clap(long, default_value = ""))]
+    pub site: String,
+
     /// The name of the site.
     #[cfg_attr(feature = "cli", clap(long, default_value = "sonata"))]
     pub title: String,
@@ -65,9 +70,9 @@ pub struct Manifest {
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "templates"))]
     pub templates: PathBuf,
 
-    #[serde(default = "default::ximage")]
+    #[serde(default = "default::image")]
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "ximage"))]
-    pub ximage: String,
+    pub image: String,
 
     /// The path of the theme.
     ///
@@ -208,9 +213,10 @@ impl Manifest {
 impl Default for Manifest {
     fn default() -> Self {
         Self {
+            site: "sonata".to_string(),
             title: "sonata".to_string(),
             base: "".to_string(),
-            ximage: "".to_string(),
+            image: "".to_string(),
             description: "".to_string(),
             favicon: default::favicon(),
             out: default::out(),
@@ -233,12 +239,18 @@ mod default {
     /// The default theme.
     pub const DEFAULT_THEME: &str = include_str!("../blog/theme/theme.css");
 
+    /// Default implementation of the site name.
+    pub fn site() -> String {
+        "".to_string()
+    }
+
     /// Default implementation of the base URL.
     pub fn base() -> String {
         "/".to_string()
     }
 
-    pub fn ximage() -> String {
+    /// Default implementation of the image.
+    pub fn image() -> String {
         "".to_string()
     }
 
