@@ -13,7 +13,7 @@ mod watch;
 #[derive(Debug, Parser)]
 pub enum Command {
     /// Builds a sonata site from its markdown files
-    Build(Build),
+    Build(Box<Build>),
     /// Creates the boilerplate structure and files for a sonata site
     Init(Init),
     /// Serves a sonata site, and rebuilds it on changes

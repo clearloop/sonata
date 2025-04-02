@@ -39,7 +39,7 @@ pub struct App<'app> {
     pub posts: Vec<Post>,
 }
 
-impl<'app> TryFrom<Manifest> for App<'app> {
+impl TryFrom<Manifest> for App<'_> {
     type Error = anyhow::Error;
 
     fn try_from(manifest: Manifest) -> Result<Self> {
@@ -57,12 +57,13 @@ impl<'app> TryFrom<Manifest> for App<'app> {
     }
 }
 
-impl<'app> App<'app> {
+impl App<'_> {
     /// Make initial data for templates
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
         map.insert("title".into(), self.manifest.title.clone().into());
         map.insert("base".into(), self.manifest.base.clone().into());
+        map.insert("ximage".into(), self.manifest.ximage.clone().into());
         map.insert(
             "description".into(),
             self.manifest.description.clone().into(),

@@ -65,6 +65,10 @@ pub struct Manifest {
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "templates"))]
     pub templates: PathBuf,
 
+    #[serde(default = "default::ximage")]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "ximage"))]
+    pub ximage: String,
+
     /// The path of the theme.
     ///
     /// Could be a file or a directory.
@@ -206,6 +210,7 @@ impl Default for Manifest {
         Self {
             title: "sonata".to_string(),
             base: "".to_string(),
+            ximage: "".to_string(),
             description: "".to_string(),
             favicon: default::favicon(),
             out: default::out(),
@@ -231,6 +236,10 @@ mod default {
     /// Default implementation of the base URL.
     pub fn base() -> String {
         "/".to_string()
+    }
+
+    pub fn ximage() -> String {
+        "".to_string()
     }
 
     /// Default implementation of the favicon path.
