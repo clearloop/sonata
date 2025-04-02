@@ -62,9 +62,15 @@ impl App<'_> {
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
 
+        map.insert("site".into(), self.manifest.site.clone().into());
         map.insert("title".into(), self.manifest.title.clone().into());
         map.insert("base".into(), self.manifest.base.clone().into());
-        map.insert("ximage".into(), self.manifest.ximage.clone().into());
+        map.insert("image".into(), self.manifest.image.clone().into());
+        map.insert("twitter".into(), self.manifest.site.clone().into());
+        map.insert(
+            "favicon".into(),
+            format!("/{}", self.manifest.favicon.file_name()?).into(),
+        );
         map.insert(
             "description".into(),
             self.manifest.description.clone().into(),
@@ -72,13 +78,6 @@ impl App<'_> {
 
         if self.livereload {
             map.insert("livereload".into(), LIVERELOAD_ENDPOINT.into());
-        }
-
-        if self.manifest.favicon.exists() {
-            map.insert(
-                "favicon".into(),
-                format!("/{}", self.manifest.favicon.file_name()?).into(),
-            );
         }
 
         if let Some(data) = value.as_object_mut() {
@@ -112,14 +111,11 @@ impl App<'_> {
             } else if self.manifest.public.exists() && self.manifest.public.is_sub(&path)? {
                 tracing::trace!("copying public: {path:?} ...");
                 self.manifest.copy_public()?;
-            } else if self.manifest.favicon.exists() && self.manifest.favicon.is_sub(&path)? {
-                tracing::trace!("rendering favicon: {path:?} ...");
-                self.render_favicon()?;
             } else if self.manifest.templates.exists() && self.manifest.templates.is_sub(&path)? {
                 tracing::info!("reloading templates ...");
                 templates_changed = true;
                 self.register_templates()?;
-            } else {
+            } else if self.manifest.favicon.exists() && self.manifest.favicon == path {
                 tracing::trace!("skipping {path:?} ...");
             }
         }
@@ -181,6 +177,8 @@ impl App<'_> {
             serde_json::json!({
                 "post": post,
                 "tab": post.meta.title,
+                "description": post.meta.description,
+                "twitter": post.meta.twitter,
             }),
         )
     }

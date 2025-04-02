@@ -38,7 +38,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: clearloop/sonata@0.0.7
+      - uses: clearloop/sonata@0.1.6
 
       - name: Build the site
         run: sonata build blog
