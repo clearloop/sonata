@@ -181,6 +181,7 @@ impl App<'_> {
             serde_json::json!({
                 "post": post,
                 "tab": post.meta.title,
+                "description": post.meta.description,
             }),
         )
     }
