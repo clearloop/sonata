@@ -8,7 +8,7 @@ inputs:
   version:
     required: true
     description: The version of sonata to install
-    default: "0.1.6"
+    default: "0.1.7"
 
 runs:
   using: composite
