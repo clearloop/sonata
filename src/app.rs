@@ -61,6 +61,7 @@ impl App<'_> {
     /// Make initial data for templates
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
+
         map.insert("title".into(), self.manifest.title.clone().into());
         map.insert("base".into(), self.manifest.base.clone().into());
         map.insert("ximage".into(), self.manifest.ximage.clone().into());
@@ -149,12 +150,14 @@ impl App<'_> {
 
         let posts = self.manifest.posts()?;
         self.render_posts(posts.clone())?;
-        self.render_index(posts)
+        self.render_index(posts)?;
+        self.render_favicon()
     }
 
     /// Render the favicon.
     pub fn render_favicon(&self) -> Result<()> {
         if self.manifest.favicon.exists() {
+            tracing::info!("rendering favicon ...");
             let favicon = self.manifest.favicon.file_name()?;
             fs::copy(&self.manifest.favicon, self.manifest.out.join(favicon))?;
         }

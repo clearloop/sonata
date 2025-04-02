@@ -42,7 +42,7 @@ pub struct Manifest {
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.svg"))]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.ico"))]
     pub favicon: PathBuf,
 
     /// The output directory.
@@ -244,7 +244,7 @@ mod default {
 
     /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
-        PathBuf::from("favicon.svg")
+        PathBuf::from("favicon.ico")
     }
 
     /// Default implementation of the out directory.

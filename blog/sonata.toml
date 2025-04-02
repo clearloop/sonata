@@ -5,7 +5,7 @@ title = "sonata" # The title of the site.
 # --------------------------------------
 base = "/"
 ximage = ""             # The image used in twitter preview.
-favicon = "favicon.svg" # The path to the favicon.
+favicon = "favicon.ico" # The path to the favicon.
 out = "out"             # The path to the output directory.
 posts = "posts"         # The path to the posts.
 public = "public"       # The path to the public directory.
