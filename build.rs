@@ -13,7 +13,7 @@ fn main() -> Result<()> {
 
     let out = std::env::var("OUT_DIR")?;
     let yarn = which::which("yarn");
-    if yarn.is_err() || std::env::var("SKIP_THEME").is_ok() {
+    if yarn.is_err() || std::env::var("THEME").is_err() {
         return build_no_yarn(&out);
     }
 
@@ -37,7 +37,7 @@ fn main() -> Result<()> {
 
 /// Touch files if no yarn installed
 fn build_no_yarn(out: &str) -> Result<()> {
-    println!("cargo:warning=No yarn installed, skip building default theme.");
+    println!("cargo:warning=skip building default theme, set THEME=1 to enable it.");
     for file in THEME {
         File::create(format!("{out}/{file}"))?;
     }
