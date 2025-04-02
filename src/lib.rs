@@ -1,4 +1,4 @@
-//! ## Cydonia
+//! ## sonata
 //!
 //! The static site generator.
 //!
@@ -6,7 +6,7 @@
 //!
 //! ```ignore
 //! .
-//! ├── cydonia.toml
+//! ├── sonata.toml
 //! └── posts
 //!     └── 2024-01-01-hello-world.md
 //! ```
@@ -14,8 +14,8 @@
 //! The full configuration:
 //!
 //! ```toml
-//! # my-blog/cydonia.toml
-//! title = "Cydonia"         # The title of the site.
+//! # my-blog/sonata.toml
+//! title = "sonata"         # The title of the site.
 //!
 //! # Default values of the optional fields.
 //! # --------------------------------------
@@ -50,7 +50,7 @@ pub use self::{
     post::{Meta, Post, TEMPLATE_POST},
 };
 
-/// The default cydonia templates.
+/// The default sonata templates.
 #[derive(rust_embed::RustEmbed)]
 #[folder = "blog/templates"]
 #[include = "*.hbs"]

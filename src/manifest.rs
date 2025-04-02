@@ -19,7 +19,7 @@ use ccli::{clap, clap::Parser};
 pub const MINIMAL_MANIFEST: &str = r#"
 out = "out"
 posts = "posts"
-title = "Cydonia"
+title = "sonata"
 "#;
 
 /// Manifest of the site.
@@ -27,7 +27,7 @@ title = "Cydonia"
 #[cfg_attr(feature = "cli", derive(Parser))]
 pub struct Manifest {
     /// The name of the site.
-    #[cfg_attr(feature = "cli", clap(long, default_value = "Cydonia"))]
+    #[cfg_attr(feature = "cli", clap(long, default_value = "sonata"))]
     pub title: String,
 
     /// The base URL of the site.
@@ -42,7 +42,7 @@ pub struct Manifest {
 
     /// The path to the favicon.
     #[serde(default = "default::favicon")]
-    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.svg"))]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "favicon.ico"))]
     pub favicon: PathBuf,
 
     /// The output directory.
@@ -65,6 +65,10 @@ pub struct Manifest {
     #[cfg_attr(feature = "cli", clap(short, long, default_value = "templates"))]
     pub templates: PathBuf,
 
+    #[serde(default = "default::ximage")]
+    #[cfg_attr(feature = "cli", clap(short, long, default_value = "ximage"))]
+    pub ximage: String,
+
     /// The path of the theme.
     ///
     /// Could be a file or a directory.
@@ -77,7 +81,7 @@ impl Manifest {
     /// Load manifest from the provided path.
     pub fn load(root: &Path) -> Result<Self> {
         let path = utils::find_proj(root)?;
-        let toml = path.join("cydonia.toml");
+        let toml = path.join("sonata.toml");
 
         tracing::info!("loading manifest from {toml:?}");
         let manifest: Self = toml::from_str(&toml.read()?)
@@ -204,8 +208,9 @@ impl Manifest {
 impl Default for Manifest {
     fn default() -> Self {
         Self {
-            title: "Cydonia".to_string(),
+            title: "sonata".to_string(),
             base: "".to_string(),
+            ximage: "".to_string(),
             description: "".to_string(),
             favicon: default::favicon(),
             out: default::out(),
@@ -222,20 +227,24 @@ mod default {
     use std::path::PathBuf;
 
     /// The pre-compiled highlight.js.
-    pub const HIGHLIGHT_JS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.js"));
+    pub const HIGHLIGHT_JS: &str = include_str!("../blog/theme/highlight.js");
     /// The pre-compiled highlight.css.
-    pub const HIGHLIGHT_CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/highlight.css"));
+    pub const HIGHLIGHT_CSS: &str = include_str!("../blog/theme/highlight.css");
     /// The default theme.
-    pub const DEFAULT_THEME: &str = include_str!(concat!(env!("OUT_DIR"), "/theme.css"));
+    pub const DEFAULT_THEME: &str = include_str!("../blog/theme/theme.css");
 
     /// Default implementation of the base URL.
     pub fn base() -> String {
         "/".to_string()
     }
 
+    pub fn ximage() -> String {
+        "".to_string()
+    }
+
     /// Default implementation of the favicon path.
     pub fn favicon() -> PathBuf {
-        PathBuf::from("favicon.svg")
+        PathBuf::from("favicon.ico")
     }
 
     /// Default implementation of the out directory.

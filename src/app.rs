@@ -4,7 +4,7 @@
 //! - blog
 //!   - posts
 //!     - 2023-12-29-foo-bar.md
-//!   - cydonia.toml
+//!   - sonata.toml
 //!   - theme [ theme.css ]
 //!     - index.css
 //!     - post.css
@@ -31,7 +31,7 @@ pub const LIVERELOAD_ENDPOINT: &str = "__livereload";
 pub struct App<'app> {
     /// The handlebars instance.
     pub handlebars: Handlebars<'app>,
-    /// The cydonia.toml manifest.
+    /// The sonata.toml manifest.
     pub manifest: Manifest,
     /// Whether to enable livereload.
     pub livereload: bool,
@@ -39,7 +39,7 @@ pub struct App<'app> {
     pub posts: Vec<Post>,
 }
 
-impl<'app> TryFrom<Manifest> for App<'app> {
+impl TryFrom<Manifest> for App<'_> {
     type Error = anyhow::Error;
 
     fn try_from(manifest: Manifest) -> Result<Self> {
@@ -57,12 +57,14 @@ impl<'app> TryFrom<Manifest> for App<'app> {
     }
 }
 
-impl<'app> App<'app> {
+impl App<'_> {
     /// Make initial data for templates
     pub fn data(&self, mut value: Value) -> Result<Value> {
         let mut map = Map::<String, Value>::new();
+
         map.insert("title".into(), self.manifest.title.clone().into());
         map.insert("base".into(), self.manifest.base.clone().into());
+        map.insert("ximage".into(), self.manifest.ximage.clone().into());
         map.insert(
             "description".into(),
             self.manifest.description.clone().into(),
@@ -98,21 +100,27 @@ impl<'app> App<'app> {
     }
 
     /// Conditional render the site
-    pub fn conditional_render(&mut self, paths: Vec<PathBuf>) -> Result<()> {
+    pub fn crender(&mut self, paths: Vec<PathBuf>) -> Result<()> {
         let mut templates_changed = false;
         for path in paths {
-            if self.manifest.posts.is_sub(&path)? {
+            if self.manifest.posts.exists() && self.manifest.posts.is_sub(&path)? {
+                tracing::trace!("rendering post: {path:?} ...");
                 self.render_post(Post::load(&path)?)?;
-            } else if self.manifest.theme.is_sub(&path)? {
+            } else if self.manifest.theme.exists() && self.manifest.theme.is_sub(&path)? {
+                tracing::trace!("rendering theme: {path:?} ...");
                 self.render_theme()?;
-            } else if self.manifest.public.is_sub(&path)? {
+            } else if self.manifest.public.exists() && self.manifest.public.is_sub(&path)? {
+                tracing::trace!("copying public: {path:?} ...");
                 self.manifest.copy_public()?;
-            } else if self.manifest.favicon.is_sub(&path)? {
+            } else if self.manifest.favicon.exists() && self.manifest.favicon.is_sub(&path)? {
+                tracing::trace!("rendering favicon: {path:?} ...");
                 self.render_favicon()?;
-            } else if self.manifest.templates.is_sub(&path)? {
+            } else if self.manifest.templates.exists() && self.manifest.templates.is_sub(&path)? {
                 tracing::info!("reloading templates ...");
                 templates_changed = true;
                 self.register_templates()?;
+            } else {
+                tracing::trace!("skipping {path:?} ...");
             }
         }
 
@@ -142,12 +150,14 @@ impl<'app> App<'app> {
 
         let posts = self.manifest.posts()?;
         self.render_posts(posts.clone())?;
-        self.render_index(posts)
+        self.render_index(posts)?;
+        self.render_favicon()
     }
 
     /// Render the favicon.
     pub fn render_favicon(&self) -> Result<()> {
         if self.manifest.favicon.exists() {
+            tracing::info!("rendering favicon ...");
             let favicon = self.manifest.favicon.file_name()?;
             fs::copy(&self.manifest.favicon, self.manifest.out.join(favicon))?;
         }

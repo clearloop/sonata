@@ -17,7 +17,7 @@ use std::{
 /// Watch command
 #[derive(Parser, Debug, Clone)]
 pub struct Watch {
-    /// The root of the cydonia site
+    /// The root of the sonata site
     #[clap(default_value = ".")]
     pub dir: PathBuf,
 
@@ -58,8 +58,8 @@ impl Watch {
                         return;
                     }
 
-                    if let Err(e) = app.conditional_render(event.paths.clone()) {
-                        tracing::error!("render failed: {:?}", e);
+                    if let Err(e) = app.crender(event.paths.clone()) {
+                        tracing::error!("conditional render failed: {:?}", e);
                     }
 
                     if let Err(e) = tx.send(event) {

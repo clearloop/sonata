@@ -1,6 +1,6 @@
 use ccli::{App, Result};
-use cydonia::cmd::Cydonia;
+use sonata::cmd::Sonata;
 
 fn main() -> Result<()> {
-    Cydonia::start()
+    Sonata::start()
 }

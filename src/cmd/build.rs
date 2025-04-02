@@ -6,14 +6,14 @@ use ccli::{clap, clap::Parser};
 use colored::Colorize;
 use std::path::PathBuf;
 
-/// Render cydonia project to the output directory.
+/// Render sonata project to the output directory.
 #[derive(Debug, Parser)]
 pub struct Build {
     /// The directory to build.
     #[clap(default_value = ".")]
     pub dir: PathBuf,
 
-    /// Cydonia manifest.
+    /// sonata manifest.
     #[clap(flatten)]
     pub manifest: Manifest,
 }

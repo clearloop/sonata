@@ -1,7 +1,7 @@
-//! Main tests for cydonia.
+//! Main tests for sonata.
 
 use anyhow::Result;
-use cydonia::{App, Manifest, Post};
+use sonata::{App, Manifest, Post};
 use std::path::PathBuf;
 
 fn manifest() -> Result<Manifest> {

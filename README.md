@@ -1,22 +1,22 @@
-# Cydonia
+# sonata
 
-[![cydonia][version-badge]][version-link]
+[![sonata][version-badge]][version-link]
 [![ci][ci-badge]][ci-link]
 
 ## Usage
 
 ```bash
-cargo install cydonia
-cydonia init blog
-cydonia serve blog
+cargo install sonata
+sonata init blog
+sonata serve blog
 ```
 
-The minimal directory layout is like below, see [cydonia.toml](./blog/cydonia.toml)
+The minimal directory layout is like below, see [sonata.toml](./blog/sonata.toml)
 for the full configuration.
 
 ```
 my-blog
-├── cydonia.toml
+├── sonata.toml
 └── posts
     └── 2024-01-01-hello-world.md
 ```
@@ -24,7 +24,7 @@ my-blog
 ## Github Action
 
 ```yaml
-name: Cydonia
+name: sonata
 
 on:
   push:
@@ -38,10 +38,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: clearloop/cydonia@0.0.7
+      - uses: clearloop/sonata@0.0.7
 
       - name: Build the site
-        run: cydonia build blog
+        run: sonata build blog
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
@@ -54,7 +54,7 @@ jobs:
 
 GPL-3.0-only
 
-[version-badge]: https://img.shields.io/crates/v/cydonia
-[version-link]: https://docs.rs/cydonia
-[ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/cydonia/main.yml
-[ci-link]: https://github.com/clearloop/cydonia/actions/workflows/main.yml
+[version-badge]: https://img.shields.io/crates/v/sonata
+[version-link]: https://docs.rs/sonata
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/clearloop/sonata/main.yml
+[ci-link]: https://github.com/clearloop/sonata/actions/workflows/main.yml

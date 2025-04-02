@@ -13,13 +13,13 @@ use std::{
 /// The template of the post.
 pub const TEMPLATE_POST: &str = r#"
 ---
-author: "cydonia"
+author: ""
 date: "2024-01-01"
-description: "This is my first post with cydonia !"
-labels: ["cydonia", "rust"]
+description: "This is my first post with sonata !"
+labels: ["sonata", "rust"]
 title: "Hello World!"
 ---
-This is my first post with cydonia !
+This is my first post with sonata !
 "#;
 
 /// Post layout with is markdown with yaml metadata.
@@ -67,6 +67,9 @@ impl Post {
             )
             .ok_or_else(|| anyhow!("invalid date of post {name}"))?;
         }
+
+        // set the formatted date
+        self.meta.formatted_date = self.meta.date.format("%b. %d, %Y").to_string();
 
         if self.meta.title.is_empty() {
             meta[3].split('-').for_each(|s| {
@@ -116,9 +119,15 @@ impl FromStr for Post {
 pub struct Meta {
     /// The author of the post.
     pub author: String,
+    /// The profile url of the author.
+    #[serde(default)]
+    pub profile_url: String,
     /// The date of the post.
     #[serde(default)]
     pub date: NaiveDate,
+    /// Formatted date
+    #[serde(default)]
+    pub formatted_date: String,
     /// The description of the post.
     pub description: String,
     /// The labels of the post.
