@@ -1,6 +1,6 @@
 [package]
 name = "sonata"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["clearloop"]
 description = "The static site generator."
@@ -15,7 +15,7 @@ include = [
     "src",
     "build.rs",
     "tests",
-    "LINCESE",
+    "LICENSE",
     "README.md",
 ]
 

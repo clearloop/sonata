@@ -16,14 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
 
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
 
       - name: Run Tests
-        run: cargo nextest run --no-fail-fast --release
+        run: THEME=1 cargo nextest run --no-fail-fast --release
 
   check:
     name: Check
@@ -33,6 +31,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Format
-        run: cargo fmt --check
+        run: THEME=1 cargo fmt --check
       - name: Clippy
-        run: cargo clippy --all -- -D warnings
+        run: THEME=1 cargo clippy --all -- -D warnings
