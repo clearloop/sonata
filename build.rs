@@ -1,9 +1,5 @@
 use anyhow::{anyhow, Result};
-use std::{
-    fs::{self, File},
-    path::PathBuf,
-    process::Command,
-};
+use std::{fs::File, path::PathBuf, process::Command};
 
 /// Default theme files
 const THEME: [&str; 3] = ["highlight.js", "highlight.css", "theme.css"];
@@ -12,10 +8,17 @@ fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=blog/theme");
 
-    let res = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("res");
+    // check if yarn exist
+    let root = env!("CARGO_MANIFEST_DIR");
+    let out = PathBuf::from(root).join("blog/out");
     let yarn = which::which("yarn");
-    if yarn.is_err() || std::env::var("SKIP_THEME").is_ok() {
-        return build_no_yarn(&res);
+    if yarn.is_err() {
+        return build_no_yarn(&out, false);
+    }
+
+    // check if THEME is enabled
+    if std::env::var("THEME").is_err() {
+        return build_no_yarn(&out, true);
     }
 
     // Build default theme
@@ -27,18 +30,16 @@ fn main() -> Result<()> {
         return Err(anyhow!("build default theme failed."));
     }
 
-    // Copy theme to output directory
-    let root = env!("CARGO_MANIFEST_DIR");
-    for file in THEME {
-        fs::copy(format!("{root}/blog/theme/{file}"), res.join(file))?;
-    }
-
     Ok(())
 }
 
 /// Touch files if no yarn installed
-fn build_no_yarn(out: &PathBuf) -> Result<()> {
-    println!("cargo:warning=yarn not found, skip building default theme.");
+fn build_no_yarn(out: &PathBuf, yarn: bool) -> Result<()> {
+    if yarn {
+        println!("THEME is disabled, set THEME=1 to enable default theme.");
+    } else {
+        println!("cargo:warning=yarn not found.");
+    }
     for file in THEME {
         File::create(out.join(file))?;
     }

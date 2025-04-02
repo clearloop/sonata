@@ -8,7 +8,15 @@ documentation = "https://docs.rs/sonata"
 homepage = "https://github.com/clearloop/sonata"
 repository = "https://github.com/clearloop/sonata.git"
 license = "GPL-3.0-only"
-include = ["res", "src", "Cargo.toml", "README.md", "LICENSE"]
+include = [
+    "Cargo.toml",
+    "blog",
+    "src",
+    "build.rs",
+    "tests",
+    "LINCESE",
+    "README.md",
+]
 
 [dependencies]
 anyhow = "1.0.79"

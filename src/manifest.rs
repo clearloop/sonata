@@ -227,11 +227,11 @@ mod default {
     use std::path::PathBuf;
 
     /// The pre-compiled highlight.js.
-    pub const HIGHLIGHT_JS: &str = include_str!("../res/highlight.js");
+    pub const HIGHLIGHT_JS: &str = include_str!("../blog/out/highlight.js");
     /// The pre-compiled highlight.css.
-    pub const HIGHLIGHT_CSS: &str = include_str!("../res/highlight.css");
+    pub const HIGHLIGHT_CSS: &str = include_str!("../blog/out/highlight.css");
     /// The default theme.
-    pub const DEFAULT_THEME: &str = include_str!("../res/theme.css");
+    pub const DEFAULT_THEME: &str = include_str!("../blog/out/theme.css");
 
     /// Default implementation of the base URL.
     pub fn base() -> String {
